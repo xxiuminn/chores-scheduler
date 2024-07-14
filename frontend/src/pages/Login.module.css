@@ -1,0 +1,74 @@
+.bg {
+  width: 100vw;
+  height: 100vh;
+  background-image: url("../../assets/login-bg.png");
+  background-repeat: no-repeat;
+  background-size: cover;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.container {
+  background-color: rgba(255, 255, 255, 0.9);
+  min-width: 20em;
+  height: 30em;
+  border-radius: 3em;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+h2 {
+  font-size: 3em;
+}
+
+.form {
+  width: 80%;
+  height: 60%;
+  background-color: white;
+  border-radius: 1em;
+  box-shadow: 0 0 0.1em gray;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+  align-items: center;
+}
+
+.inputContainer {
+  display: flex;
+  flex-direction: column;
+  width: 80%;
+}
+
+input {
+  border: none;
+  outline: none;
+}
+
+.inputbox {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 0.3em;
+  box-shadow: 0 0 0.1em gray;
+  height: 2em;
+  padding: 1em;
+  width: 80%;
+}
+
+button {
+  background-color: rgb(44, 42, 42);
+  color: white;
+  border: none;
+  border-radius: 0.3em;
+  height: 2em;
+  width: 80%;
+}
+
+span {
+  text-decoration: underline;
+}
