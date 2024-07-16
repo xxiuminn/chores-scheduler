@@ -42,7 +42,7 @@ const Calendar = () => {
   console.log("firstDateOfMonth", firstDateOfMonth.getDate());
   // const dayOfFirstDateOfMonth = firstDateOfMonth.getDay();
   // console.log("dayOfFirstDateOfMonth", dayOfFirstDateOfMonth);
-  console.log(new Date(year, monthIndex, -1));
+  console.log("testing", new Date(year, monthIndex, 32));
 
   const firstWeekOfMonth = Math.ceil(
     (new Date(year, monthIndex, 1) - yearStart() + 1) / 86400000 / 7
@@ -52,7 +52,6 @@ const Calendar = () => {
   const lastDateOfMonth = new Date(year, monthIndex + 1, 0);
   console.log("lastDateOfMonth", lastDateOfMonth);
 
-  const dayOfLastDateOfMonth = lastDateOfMonth.getDay();
   const daysInMonth = lastDateOfMonth.getDate();
   console.log("daysInMonth", daysInMonth);
 
@@ -64,6 +63,7 @@ const Calendar = () => {
   const getMonthArr = () => {
     let monthArr = [];
     let dayOfFirstDateOfMonth = firstDateOfMonth.getDay();
+    let dayOfLastDateOfMonth = lastDateOfMonth.getDay();
     while (dayOfFirstDateOfMonth > 0) {
       // monthArr.push(new Date(year, monthIndex, 1 - dayOfFirstDateOfMonth));
       // dayOfFirstDateOfMonth -= 1;
@@ -79,6 +79,12 @@ const Calendar = () => {
         (new Date(year, monthIndex, date) - yearStart() + 1) / 86400000 / 7
       );
       // monthArr.push(new Date(year, monthIndex, date));
+      monthArr.push({ weekOfDate, date });
+    }
+    for (let addDays = 1; addDays < 6 - dayOfLastDateOfMonth + 1; addDays++) {
+      const fullDate = new Date(year, monthIndex, daysInMonth + addDays);
+      const date = fullDate.getDate();
+      const weekOfDate = Math.ceil((fullDate - yearStart() + 1) / 86400000 / 7);
       monthArr.push({ weekOfDate, date });
     }
     return monthArr;
