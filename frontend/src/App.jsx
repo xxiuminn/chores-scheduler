@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
+import Calendar from "./components/Calendar";
 
 function App() {
   const [showLogin, setShowLogin] = useState(true);
@@ -11,8 +12,9 @@ function App() {
 
   return (
     <>
-      {showLogin && <Login handleShowLogin={handleShowLogin} />}
-      {!showLogin && <Register handleShowLogin={handleShowLogin} />}
+      <Calendar />
+      {/* {showLogin && <Login handleShowLogin={handleShowLogin} />}
+      {!showLogin && <Register handleShowLogin={handleShowLogin} />} */}
     </>
   );
 }
