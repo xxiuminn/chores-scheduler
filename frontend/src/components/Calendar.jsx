@@ -44,25 +44,26 @@ const Calendar = () => {
       const fullDate = new Date(year, monthIndex, 1 - dayOfFirstDateOfMonth);
       const date = fullDate.getDate();
       const weekOfDate = Math.ceil((fullDate - yearStart() + 1) / 86400000 / 7);
-      monthArr.push({ weekOfDate, date });
+      monthArr.push({ weekOfDate, date, fullDate });
       dayOfFirstDateOfMonth -= 1;
     }
 
     //fill in dates for the rest of the month
     for (let date = 1; date < daysInMonth + 1; date++) {
-      const day = new Date(year, monthIndex, date).getDay();
+      const fullDate = new Date(year, monthIndex, date);
+      // const day = fullDate.getDay();
       const weekOfDate = Math.ceil(
         (new Date(year, monthIndex, date) - yearStart() + 1) / 86400000 / 7
       );
-      monthArr.push({ weekOfDate, date });
+      monthArr.push({ weekOfDate, date, fullDate });
     }
 
-    //fill in dates for the last week of the month
+    // fill in dates for the last week of the month
     for (let addDays = 1; addDays < 6 - dayOfLastDateOfMonth + 1; addDays++) {
       const fullDate = new Date(year, monthIndex, daysInMonth + addDays);
       const date = fullDate.getDate();
       const weekOfDate = Math.ceil((fullDate - yearStart() + 1) / 86400000 / 7);
-      monthArr.push({ weekOfDate, date });
+      monthArr.push({ weekOfDate, date, fullDate });
     }
     return monthArr;
   };
@@ -71,7 +72,7 @@ const Calendar = () => {
     setYear(selectedDate.getFullYear());
     setMonthIndex(selectedDate.getMonth());
     setWeek(Math.ceil((selectedDate - yearStart() + 1) / 86400000 / 7));
-  }, [selectedDate]);
+  }, [selectedDate, year]);
 
   const handlePrev = () => {
     setSelectedDate(new Date(selectedDate.getTime() - 7 * 24 * 60 * 60 * 1000));
@@ -82,30 +83,45 @@ const Calendar = () => {
   };
 
   return (
-    <div className="container">
-      <div className="row text-center">
-        <div onClick={handlePrev}>
-          <i className="bi bi-arrow-left-circle"></i>
+    <>
+      <div className="container">
+        <div className="row text-center">
+          <div onClick={handlePrev}>
+            <i className="bi bi-arrow-left-circle"></i>
+          </div>
+          <div className="col">{thisMonth}</div>
+          <div onClick={handleNext}>
+            <i className="bi bi-arrow-right-circle"></i>
+          </div>
         </div>
-        <div className="col">{thisMonth}</div>
-        <div onClick={handleNext}>
-          <i className="bi bi-arrow-right-circle"></i>
+        <div className="row text-center">
+          {daysInWeek.map((date) => (
+            <div className="col">{date}</div>
+          ))}
+        </div>
+        {/* calendar weekly view - only showing the 'selected' week */}
+        <div className="row text-center">
+          {getMonthArr().map((item) => {
+            if (item.weekOfDate === week) {
+              return (
+                <div
+                  key={item.fullDate}
+                  className={`col ${
+                    item.fullDate.toDateString() == selectedDate.toDateString()
+                      ? styles.selected
+                      : ""
+                  }`}
+                  onClick={() => setSelectedDate(item.fullDate)}
+                >
+                  {item.date}
+                </div>
+              );
+            }
+          })}
         </div>
       </div>
-      <div className="row text-center">
-        {daysInWeek.map((date) => (
-          <div className="col">{date}</div>
-        ))}
-      </div>
-      {/* calendar weekly view - only showing the 'selected' week */}
-      <div className="row text-center">
-        {getMonthArr().map((item) => {
-          if (item.weekOfDate === week) {
-            return <div className="col">{item.date}</div>;
-          }
-        })}
-      </div>
-    </div>
+      <div>{selectedDate.toDateString()}</div>
+    </>
   );
 };
 
