@@ -1,11 +1,42 @@
-import React, { useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import styles from "./Login.module.css";
+import useFetch from "../hooks/useFetch";
+import { useQuery } from "@tanstack/react-query";
+import UserContext from "../context/user";
 
 const Login = (props) => {
+  const fetchData = useFetch();
+  const userCtx = useContext(UserContext);
   const [viewPw, setViewPw] = useState(false);
   const [password, setPassword] = useState("");
   const [email, setEmail] = useState("");
   const [inputType, setInputType] = useState("password");
+
+  const { data, refetch } = useQuery({
+    queryKey: ["login"],
+    queryFn: async () => {
+      try {
+        return await fetchData(
+          "/api/user/login",
+          "POST",
+          { email, password },
+          undefined
+        );
+      } catch (error) {
+        throw error.message;
+      }
+    },
+    enabled: false,
+  });
+
+  useEffect(() => {
+    if (data) {
+      userCtx.setAccessToken(data.access);
+      // const decoded = jwtDecode(data.access);
+      console.log(data.access);
+      console.log("login successful");
+    }
+  }, [data]);
 
   const handleShowPw = (type) => {
     setViewPw(!viewPw);
@@ -53,7 +84,7 @@ const Login = (props) => {
                 ></i>
               )}
             </div>
-            <button>Sign In</button>
+            <button onClick={refetch}>Sign In</button>
             <div>
               Don't have an account?{" "}
               <span onClick={() => props.handleShowLogin()}>Join</span>
