@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import styles from "./Calendar.module.css";
-import CalendarRow from "./CalendarRow";
 
 const Calendar = () => {
   const [selectedDate, setSelectedDate] = useState(new Date());
@@ -42,28 +41,30 @@ const Calendar = () => {
     //fill in dates for the first week of the month
     while (dayOfFirstDateOfMonth > 0) {
       const fullDate = new Date(year, monthIndex, 1 - dayOfFirstDateOfMonth);
+      const day = fullDate.getDay();
       const date = fullDate.getDate();
       const weekOfDate = Math.ceil((fullDate - yearStart() + 1) / 86400000 / 7);
-      monthArr.push({ weekOfDate, date, fullDate });
+      monthArr.push({ weekOfDate, date, fullDate, day });
       dayOfFirstDateOfMonth -= 1;
     }
 
     //fill in dates for the rest of the month
     for (let date = 1; date < daysInMonth + 1; date++) {
       const fullDate = new Date(year, monthIndex, date);
-      // const day = fullDate.getDay();
+      const day = fullDate.getDay();
       const weekOfDate = Math.ceil(
         (new Date(year, monthIndex, date) - yearStart() + 1) / 86400000 / 7
       );
-      monthArr.push({ weekOfDate, date, fullDate });
+      monthArr.push({ weekOfDate, date, fullDate, day });
     }
 
     // fill in dates for the last week of the month
     for (let addDays = 1; addDays < 6 - dayOfLastDateOfMonth + 1; addDays++) {
       const fullDate = new Date(year, monthIndex, daysInMonth + addDays);
+      const day = fullDate.getDay();
       const date = fullDate.getDate();
       const weekOfDate = Math.ceil((fullDate - yearStart() + 1) / 86400000 / 7);
-      monthArr.push({ weekOfDate, date, fullDate });
+      monthArr.push({ weekOfDate, date, fullDate, day });
     }
     return monthArr;
   };
@@ -84,43 +85,67 @@ const Calendar = () => {
 
   return (
     <>
-      <div className="container">
-        <div className="row text-center">
-          <div onClick={handlePrev}>
-            <i className="bi bi-arrow-left-circle"></i>
+      <div className={styles.board}>
+        <div className={styles.topnav}>
+          <div className={styles.topleftnav}>
+            <div className={styles.navbar}>
+              <i class="bi bi-arrow-right"></i>
+            </div>
+            <div>
+              <h3>{thisMonth}</h3>
+            </div>
           </div>
-          <div className="col">{thisMonth}</div>
-          <div onClick={handleNext}>
-            <i className="bi bi-arrow-right-circle"></i>
+          <div className={styles.toprightnav}>
+            <div className="dropdown">
+              <button className={styles.profile}>
+                <i className="bi bi-person"></i>
+              </button>
+              <ul className="dropdown-menu">
+                <li>
+                  <a className="dropdown-item" href="#">
+                    test
+                  </a>
+                </li>
+              </ul>
+            </div>
+            <button className={styles.prevnext} onClick={handlePrev}>
+              <i className="bi bi-chevron-left"></i>
+            </button>
+            <button className={styles.prevnext} onClick={handleNext}>
+              <i className="bi bi-chevron-right"></i>
+            </button>
           </div>
         </div>
-        <div className="row text-center">
-          {daysInWeek.map((date) => (
-            <div className="col">{date}</div>
-          ))}
-        </div>
-        {/* calendar weekly view - only showing the 'selected' week */}
-        <div className="row text-center">
-          {getMonthArr().map((item) => {
-            if (item.weekOfDate === week) {
-              return (
-                <div
-                  key={item.fullDate}
-                  className={`col ${
-                    item.fullDate.toDateString() == selectedDate.toDateString()
-                      ? styles.selected
-                      : ""
-                  }`}
-                  onClick={() => setSelectedDate(item.fullDate)}
-                >
-                  {item.date}
-                </div>
-              );
-            }
-          })}
+        <div className={styles.calendar}>
+          <div className={styles.day}>
+            {daysInWeek.map((date) => (
+              <div>{date}</div>
+            ))}
+          </div>
+          <div className={styles.dates}>
+            {getMonthArr().map((item) => {
+              {
+                if (item.weekOfDate === week) {
+                  return (
+                    <div
+                      key={item.fullDate}
+                      className={
+                        item.fullDate.toDateString() ==
+                        selectedDate.toDateString()
+                          ? styles.selected
+                          : styles.date
+                      }
+                      onClick={() => setSelectedDate(item.fullDate)}
+                    >
+                      {item.date}
+                    </div>
+                  );
+                }
+              }
+            })}
+          </div>
         </div>
       </div>
-      <div>{selectedDate.toDateString()}</div>
     </>
   );
 };
