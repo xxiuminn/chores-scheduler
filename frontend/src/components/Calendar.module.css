@@ -1,15 +1,70 @@
-.dates {
-  display: flex;
-  flex-direction: row;
+.board {
+  display: grid;
+  grid-template-rows: 1fr 9fr;
+  min-height: 100vh;
+  width: 100vw;
+  padding: 1em 2em 1em 2em;
 }
 
-.col {
+.topnav,
+.topleftnav,
+.toprightnav,
+.calendar {
   display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.calendar {
   flex-direction: column;
+  justify-content: flex-start;
+}
+
+.day,
+.dates {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(10em, 1fr));
+  gap: 1em;
+  width: 100%;
+  align-items: center;
+  justify-items: center;
+}
+
+.navbar {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: none;
+  background-color: bisque;
+  min-width: 2em;
+  min-height: 2em;
+  margin-right: 1em;
+  border-radius: 0.5em;
+}
+
+.profile,
+.prevnext,
+.selected {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: none;
+  border-radius: 1em;
+  background-color: bisque;
+  min-width: 2em;
+  min-height: 2em;
+  margin-left: 1em;
+  cursor: pointer;
+  color: black;
+}
+
+.profile:hover,
+.prevnext:hover,
+.selected:hover {
+  cursor: pointer;
 }
 
 .selected {
-  background-color: aqua;
-  width: 20px;
-  border-radius: 10px;
+  margin: 0;
 }
