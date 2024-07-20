@@ -1,12 +1,11 @@
 import React, { useContext, useEffect, useState } from "react";
+import Cookies from "js-cookie";
 import styles from "./Login.module.css";
 import useFetch from "../hooks/useFetch";
 import { useQuery } from "@tanstack/react-query";
-import UserContext from "../context/user";
 
 const Login = (props) => {
   const fetchData = useFetch();
-  const userCtx = useContext(UserContext);
   const [viewPw, setViewPw] = useState(false);
   const [password, setPassword] = useState("");
   const [email, setEmail] = useState("");
@@ -31,7 +30,11 @@ const Login = (props) => {
 
   useEffect(() => {
     if (data) {
-      userCtx.setAccessToken(data.access);
+      Cookies.set("token", data.access, {
+        expires: 7,
+        secure: true,
+        sameSite: "Strict",
+      });
       // const decoded = jwtDecode(data.access);
       console.log(data.access);
       console.log("login successful");
