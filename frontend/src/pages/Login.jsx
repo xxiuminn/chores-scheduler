@@ -38,6 +38,7 @@ const Login = (props) => {
       // const decoded = jwtDecode(data.access);
       console.log(data.access);
       console.log("login successful");
+      props.handleShowLogin();
     }
   }, [data]);
 

@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
 import styles from "./Calendar.module.css";
+import AddTaskModal from "./AddTaskModal";
 
-const Calendar = () => {
+const Calendar = (props) => {
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [year, setYear] = useState(selectedDate.getFullYear());
   const [monthIndex, setMonthIndex] = useState(selectedDate.getMonth());
@@ -88,26 +89,79 @@ const Calendar = () => {
       <div className={styles.board}>
         <div className={styles.topnav}>
           <div className={styles.topleftnav}>
-            <div className={styles.navbar}>
+            <button
+              type="button"
+              data-bs-toggle="offcanvas"
+              data-bs-target="#offcanvas"
+              aria-controls="offcanvas"
+              className={styles.opennavbar}
+            >
               <i class="bi bi-arrow-right"></i>
+            </button>
+
+            <div
+              className="offcanvas offcanvas-start"
+              tabindex="-1"
+              id="offcanvas"
+              aria-labelledby="offcanvas"
+            >
+              <div className="offcanvas-header">
+                <h5 className="offcanvas-title" id="offcanvas"></h5>
+                <button
+                  type="button"
+                  className="btn-close"
+                  data-bs-dismiss="offcanvas"
+                  aria-label="Close"
+                ></button>
+              </div>
+              <div className="offcanvas-body">
+                <ul className="options">
+                  <li>
+                    <a href="#">Your Family Board</a>
+                  </li>
+                  <li>
+                    <a href="#">Members</a>
+                  </li>
+                  <br />
+                  <li>
+                    <a href="#">Upgrade Plan</a>
+                  </li>
+                </ul>
+              </div>
             </div>
+
             <div>
               <h3>{thisMonth}</h3>
             </div>
           </div>
+
           <div className={styles.toprightnav}>
             <div className="dropdown">
-              <button className={styles.profile}>
+              <button
+                className={`dropdown-toggle ${styles.profile}`}
+                type="button"
+                data-bs-toggle="dropdown"
+              >
                 <i className="bi bi-person"></i>
               </button>
               <ul className="dropdown-menu">
                 <li>
                   <a className="dropdown-item" href="#">
-                    test
+                    Edit profile info
+                  </a>
+                </li>
+                <li>
+                  <a
+                    className="dropdown-item"
+                    href="#"
+                    onClick={() => props.logout()}
+                  >
+                    Logout
                   </a>
                 </li>
               </ul>
             </div>
+
             <button className={styles.prevnext} onClick={handlePrev}>
               <i className="bi bi-chevron-left"></i>
             </button>
@@ -116,33 +170,33 @@ const Calendar = () => {
             </button>
           </div>
         </div>
+
         <div className={styles.calendar}>
           <div className={styles.day}>
-            {daysInWeek.map((date) => (
-              <div>{date}</div>
-            ))}
-          </div>
-          <div className={styles.dates}>
-            {getMonthArr().map((item) => {
-              {
-                if (item.weekOfDate === week) {
+            {daysInWeek.map((date, index) =>
+              getMonthArr().map((item) => {
+                if (item.weekOfDate === week && item.day === index) {
                   return (
-                    <div
-                      key={item.fullDate}
-                      className={
-                        item.fullDate.toDateString() ==
-                        selectedDate.toDateString()
-                          ? styles.selected
-                          : styles.date
-                      }
-                      onClick={() => setSelectedDate(item.fullDate)}
-                    >
-                      {item.date}
+                    <div className={styles.day}>
+                      <div className={styles.date}>{date}</div>
+                      <div
+                        key={item.fullDate}
+                        className={
+                          item.fullDate.toDateString() ==
+                          selectedDate.toDateString()
+                            ? styles.selected
+                            : styles.date
+                        }
+                        onClick={() => setSelectedDate(item.fullDate)}
+                      >
+                        {item.date}
+                      </div>
+                      <AddTaskModal />
                     </div>
                   );
                 }
-              }
-            })}
+              })
+            )}
           </div>
         </div>
       </div>

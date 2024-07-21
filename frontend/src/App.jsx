@@ -13,6 +13,7 @@ function App() {
   const [accessToken, setAccessToken] = useState("");
 
   const handleShowLogin = () => {
+    setAccessToken(Cookies.get("token"));
     setShowLogin(!showLogin);
   };
 
@@ -20,11 +21,16 @@ function App() {
     setAccessToken(Cookies.get("token"));
   }, []);
 
+  const logout = () => {
+    Cookies.remove("token");
+    setAccessToken("");
+  };
+
   return (
     <>
       <QueryClientProvider client={queryClient}>
         <UserContext.Provider value={{ accessToken, setAccessToken }}>
-          {accessToken && <Calendar />}
+          {accessToken && <Calendar logout={logout} />}
           {!accessToken && (
             <>
               {showLogin && <Login handleShowLogin={handleShowLogin} />}
