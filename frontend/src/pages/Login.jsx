@@ -3,6 +3,7 @@ import Cookies from "js-cookie";
 import styles from "./Login.module.css";
 import useFetch from "../hooks/useFetch";
 import { useQuery } from "@tanstack/react-query";
+import { jwtDecode } from "jwt-decode";
 
 const Login = (props) => {
   const fetchData = useFetch();
@@ -35,7 +36,8 @@ const Login = (props) => {
         secure: true,
         sameSite: "Strict",
       });
-      // const decoded = jwtDecode(data.access);
+      const decoded = jwtDecode(data.access);
+      console.log(decoded);
       console.log(data.access);
       console.log("login successful");
       props.handleShowLogin();
