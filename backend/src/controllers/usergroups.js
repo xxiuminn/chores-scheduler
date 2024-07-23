@@ -61,8 +61,23 @@ const updateAccountType = async (req, res) => {
   }
 };
 
+const getGroupMembers = async (req, res) => {
+  try {
+    const members = await db.query("SELECT * FROM users WHERE group_id = $1", [
+      req.body.group_id,
+    ]);
+    res.json(members.rows);
+  } catch (error) {
+    console.error(error.message);
+    res
+      .status(400)
+      .json({ status: "error", msg: "error getting group members" });
+  }
+};
+
 module.exports = {
   seedAccountTypes,
   createUserGroup,
   updateAccountType,
+  getGroupMembers,
 };
