@@ -31,6 +31,16 @@ const createUserGroup = async (req, res) => {
       "INSERT INTO user_groups(name, account_type) VALUES($1,$2)",
       [req.body.usergroup_name, req.body.account_type]
     );
+
+    const userGroups = await db.query("SELECT * FROM user_groups");
+    const userGroupId = userGroups.rows[userGroups.rows.length - 1].id;
+    console.log(userGroupId);
+
+    await db.query("UPDATE users SET group_id=$1 WHERE uuid=$2", [
+      userGroupId,
+      req.body.uuid,
+    ]);
+
     res.json({ status: "ok", msg: "user group created" });
   } catch (error) {
     console.error(error.message);

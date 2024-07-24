@@ -132,6 +132,7 @@ const getTasksByUser = async (req, res) => {
       "SELECT * FROM tasks WHERE assigned_user = $1",
       [req.body.assigned_user]
     );
+
     res.json(tasks.rows);
   } catch (error) {
     console.error(error.message);
@@ -147,6 +148,11 @@ const getTask = async (req, res) => {
       "SELECT tasks.id, tasks.title, tasks.deadline, tasks.assigned_user, tasks.assigned_user, tasks.status, task_groups.is_recurring, task_groups.is_rotate, task_groups.rule FROM tasks INNER JOIN task_groups ON tasks.group_id = task_groups.id WHERE tasks.id = $1",
       [req.body.task_id]
     );
+
+    if (!task.rows.length) {
+      return res.json({ status: "error", msg: "task not found" });
+    }
+
     res.json(task.rows[0]);
   } catch (error) {
     console.error(error.message);
@@ -157,6 +163,7 @@ const getTask = async (req, res) => {
 const delTask = async (req, res) => {
   try {
     await db.query("DELETE FROM tasks WHERE id = $1", [req.body.task_id]);
+
     res.json({ status: "ok", msg: "task deleted" });
   } catch (error) {
     console.error(error.message);
@@ -206,9 +213,14 @@ const updateTask = async (req, res) => {
       last_modified_by,
       assigned_user,
     } = req.body;
+
     const task = await db.query("SELECT * FROM tasks WHERE id=$1", [
       req.body.task_id,
     ]);
+
+    if (!task.rows.length) {
+      return res.status(400).json({ status: "error", msg: "task not found" });
+    }
 
     const taskInfo = task.rows[0];
     console.log(taskInfo);
@@ -254,29 +266,25 @@ const updateAllTasks = async (req, res) => {
       status,
       last_modified_by,
       assigned_user,
-      taskgroup_id,
     } = req.body;
 
-    //check if it task is recurring
-    const isRecurring = await db.query(
-      "SELECT is_recurring FROM task_groups WHERE id=$1",
-      [taskgroup_id]
+    const task = await db.query(
+      "SELECT tasks.id, tasks.title, tasks.deadline, tasks.modified_at, tasks.status, tasks.last_modified_by, tasks.assigned_user, tasks.group_id, task_groups.is_recurring, task_groups.is_rotate, task_groups.rule FROM tasks INNER JOIN task_groups ON tasks.group_id = task_groups.id WHERE tasks.id=$1",
+      [task_id]
     );
 
-    if (!isRecurring.rows[0].is_recurring) {
+    if (task.rows[0].is_recurring === false) {
       return res
         .status(400)
         .json({ status: "error", msg: "non-recurring task" });
     }
 
     const tasks = await db.query("SELECT * FROM tasks WHERE group_id=$1", [
-      taskgroup_id,
+      task.rows[0].group_id,
     ]);
 
     const taskArr = tasks.rows;
     // console.log(taskArr);
-
-    const task = await db.query("SELECT * FROM tasks WHERE id=$1", [task_id]);
 
     const ogDeadline = task.rows[0].deadline;
     console.log(ogDeadline);
