@@ -6,6 +6,7 @@ const Calendar = (props) => {
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [year, setYear] = useState(selectedDate.getFullYear());
   const [monthIndex, setMonthIndex] = useState(selectedDate.getMonth());
+  const [modalDate, setModalDate] = useState("");
 
   const daysInWeek = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
@@ -84,6 +85,17 @@ const Calendar = (props) => {
     setSelectedDate(new Date(selectedDate.getTime() + 7 * 24 * 60 * 60 * 1000));
   };
 
+  const handleModalDate = (date) => {
+    const fulldate = date.toLocaleDateString();
+    setModalDate(
+      fulldate.split("/")[2] +
+        "-" +
+        fulldate.split("/")[1] +
+        "-" +
+        fulldate.split("/")[0]
+    );
+  };
+
   return (
     <>
       <div className={styles.board}>
@@ -96,12 +108,12 @@ const Calendar = (props) => {
               aria-controls="offcanvas"
               className={styles.opennavbar}
             >
-              <i class="bi bi-arrow-right"></i>
+              <i className="bi bi-arrow-right"></i>
             </button>
 
             <div
               className="offcanvas offcanvas-start"
-              tabindex="-1"
+              tabIndex="-1"
               id="offcanvas"
               aria-labelledby="offcanvas"
             >
@@ -191,7 +203,16 @@ const Calendar = (props) => {
                       >
                         {item.date}
                       </div>
-                      <AddTaskModal />
+                      <button
+                        type="button"
+                        data-bs-toggle="modal"
+                        data-bs-target="#addtaskmodal"
+                        className={styles.addtask}
+                        onClick={() => handleModalDate(item.fullDate)}
+                      >
+                        <i className="bi bi-plus"></i> Add Task
+                      </button>
+                      <AddTaskModal modalDate={modalDate} />
                     </div>
                   );
                 }
