@@ -6,8 +6,14 @@ const validateCreateTaskGroup = [
   body("is_recurring", "is recurring is required").notEmpty().isInt(),
   body("title", "title is required").notEmpty().isString(),
   body("deadline", "deadline is required").notEmpty().isDate(),
-  body("is_rotate", "is rotate is required").optional().notEmpty().isInt(),
-  body("rule", "rule is required").optional().notEmpty().isString(),
+  body("is_rotate", "is rotate is required")
+    .optional({ checkFalsy: true })
+    .notEmpty()
+    .isInt(),
+  body("rule", "rule is required")
+    .optional({ checkFalsy: true })
+    .notEmpty()
+    .isString(),
   body("created_by", "created by is required").notEmpty().isString(),
 ];
 
