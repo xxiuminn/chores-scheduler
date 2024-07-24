@@ -17,7 +17,7 @@ const Login = (props) => {
     queryFn: async () => {
       try {
         return await fetchData(
-          "/api/user/login",
+          "/auth/login",
           "POST",
           { email, password },
           undefined

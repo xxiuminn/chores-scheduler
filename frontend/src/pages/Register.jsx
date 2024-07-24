@@ -14,7 +14,7 @@ const Register = (props) => {
   const { mutate } = useMutation({
     mutationFn: async () =>
       await fetchData(
-        "/api/user/register",
+        "/auth/register",
         "POST",
         {
           name,

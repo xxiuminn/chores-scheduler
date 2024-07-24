@@ -23,13 +23,15 @@ const createTaskGroup = async (req, res) => {
     console.log(memberIndex);
     // if task group is set to non recurring:
     if (req.body.is_recurring === 0) {
-      await db.query("INSERT INTO task_groups(is_recurring) VALUES($1)", [
-        Boolean(req.body.is_recurring),
-      ]);
+      const taskGroup = await db.query(
+        "INSERT INTO task_groups(is_recurring) VALUES($1) RETURNING id",
+        [Boolean(req.body.is_recurring)]
+      );
 
-      const taskGroup = await db.query("SELECT * FROM task_groups");
+      // const taskGroup = await db.query("SELECT * FROM task_groups");
       const { rows } = taskGroup;
-      const taskGroupId = rows[rows.length - 1].id;
+      const taskGroupId = rows[0].id;
+      console.log(taskGroupId);
 
       await db.query(
         "INSERT INTO tasks(title, deadline, assigned_user, created_by, group_id) VALUES($1,$2,$3,$4,$5)",
@@ -46,8 +48,8 @@ const createTaskGroup = async (req, res) => {
     // if task group is set to recurring & no rotation
     else if (req.body.is_recurring === 1) {
       //create task group
-      await db.query(
-        "INSERT INTO task_groups(is_recurring, is_rotate, rule) VALUES($1,$2,$3)",
+      const taskGroup = await db.query(
+        "INSERT INTO task_groups(is_recurring, is_rotate, rule) VALUES($1,$2,$3) RETURNING id",
         [
           Boolean(req.body.is_recurring),
           Boolean(req.body.is_rotate),
@@ -56,9 +58,8 @@ const createTaskGroup = async (req, res) => {
       );
 
       //identify task group id
-      const taskGroup = await db.query("SELECT * FROM task_groups");
       const { rows } = taskGroup;
-      const taskGroupId = rows[rows.length - 1].id;
+      const taskGroupId = rows[0].id;
       let r;
       if (req.body.rule === "DAILY") {
         r = 365;
