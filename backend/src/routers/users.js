@@ -6,10 +6,15 @@ const {
   getUserInfo,
 } = require("../controllers/users");
 const router = express.Router();
+const {
+  validateUpdateUserInfo,
+  validateGetUserInfo,
+} = require("../validators/users");
+const checkErrors = require("../validators/checkErrors");
 
 router.get("/users", getUsers);
 router.post("/seed", seedUsers);
-router.patch("/update", updateUserInfo);
-router.post("/user", getUserInfo);
+router.patch("/update", validateUpdateUserInfo, checkErrors, updateUserInfo);
+router.post("/user", validateGetUserInfo, checkErrors, getUserInfo);
 
 module.exports = router;
