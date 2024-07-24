@@ -10,8 +10,11 @@ const db = require("../db/db");
 // };
 
 const createTaskGroup = async (req, res) => {
+  const client = await db.connect();
   try {
-    const members = await db.query(
+    await client.query("BEGIN");
+
+    const members = await client.query(
       "SELECT uuid FROM users WHERE group_id = $1",
       [req.body.usergroup_id]
     );
@@ -23,7 +26,7 @@ const createTaskGroup = async (req, res) => {
     console.log(memberIndex);
     // if task group is set to non recurring:
     if (req.body.is_recurring === 0) {
-      const taskGroup = await db.query(
+      const taskGroup = await client.query(
         "INSERT INTO task_groups(is_recurring) VALUES($1) RETURNING id",
         [Boolean(req.body.is_recurring)]
       );
@@ -33,7 +36,7 @@ const createTaskGroup = async (req, res) => {
       const taskGroupId = rows[0].id;
       console.log(taskGroupId);
 
-      await db.query(
+      await client.query(
         "INSERT INTO tasks(title, deadline, assigned_user, created_by, group_id) VALUES($1,$2,$3,$4,$5)",
         [
           req.body.title,
@@ -48,7 +51,7 @@ const createTaskGroup = async (req, res) => {
     // if task group is set to recurring & no rotation
     else if (req.body.is_recurring === 1) {
       //create task group
-      const taskGroup = await db.query(
+      const taskGroup = await client.query(
         "INSERT INTO task_groups(is_recurring, is_rotate, rule) VALUES($1,$2,$3) RETURNING id",
         [
           Boolean(req.body.is_recurring),
@@ -73,7 +76,7 @@ const createTaskGroup = async (req, res) => {
         deadline.setDate(deadline.getDate() + n);
 
         if (req.body.is_rotate === 0) {
-          await db.query(
+          await client.query(
             "INSERT INTO tasks(title, deadline, assigned_user, created_by, group_id) VALUES($1, $2, $3, $4, $5)",
             [
               req.body.title,
@@ -91,7 +94,7 @@ const createTaskGroup = async (req, res) => {
           }
           console.log(memberIndex);
           console.log(members.rows[memberIndex].uuid);
-          await db.query(
+          await client.query(
             "INSERT INTO tasks(title, deadline, assigned_user, created_by, group_id) VALUES($1, $2, $3, $4, $5)",
             [
               req.body.title,
@@ -106,9 +109,13 @@ const createTaskGroup = async (req, res) => {
       }
     } else return;
     res.json({ status: "ok", msg: "task group created" });
+    await client.query("COMMIT");
   } catch (error) {
+    await client.query("ROLLBACK");
     console.error(error.message);
     res.status(400).json({ status: "error", msg: "error creating task" });
+  } finally {
+    client.release();
   }
 };
 
@@ -163,8 +170,14 @@ const getTask = async (req, res) => {
 
 const delTask = async (req, res) => {
   try {
-    await db.query("DELETE FROM tasks WHERE id = $1", [req.body.task_id]);
-
+    const task = await db.query("DELETE FROM tasks WHERE id = $1", [
+      req.body.task_id,
+    ]);
+    if (!task.rows.length) {
+      return res
+        .status(400)
+        .json({ status: "error", msg: "task cannot be found" });
+    }
     res.json({ status: "ok", msg: "task deleted" });
   } catch (error) {
     console.error(error.message);
@@ -173,34 +186,72 @@ const delTask = async (req, res) => {
 };
 
 const delAllTasks = async (req, res) => {
+  const client = await db.connect();
   try {
-    await db.query("DELETE FROM tasks WHERE group_id = $1", [
-      req.body.taskgroup_id,
+    await client.query("BEGIN");
+
+    const task = await client.query("SELECT group_id FROM tasks WHERE id=$1", [
+      req.body.task_id,
     ]);
-    await db.query("DELETE FROM task_groups WHERE id = $1", [
-      req.body.taskgroup_id,
-    ]);
+
+    if (!task.rows.length) {
+      return res
+        .status(400)
+        .json({ status: "error", msg: "task cannot be found" });
+    }
+
+    console.log(task);
+    const groupTaskId = task.rows[0].group_id;
+    console.log(groupTaskId);
+
+    await client.query("DELETE FROM tasks WHERE group_id = $1", [groupTaskId]);
+
+    await client.query("DELETE FROM task_groups WHERE id = $1", [groupTaskId]);
+
+    await client.query("COMMIT");
     res.json({ status: "ok", msg: "deleted all tasks" });
   } catch (error) {
+    await client.query("ROLLBACK");
     console.error(error.message);
     res
       .status(400)
       .json({ status: "error", msg: "error deleting all tasks in group" });
+  } finally {
+    client.release();
   }
 };
 
 const delFollowingTasks = async (req, res) => {
+  const client = await db.connect();
   try {
-    await db.query("DELETE FROM tasks WHERE group_id = $1 AND deadline >= $2", [
-      req.body.taskgroup_id,
-      req.body.deadline,
-    ]);
+    await client.query("BEGIN");
+
+    const task = await client.query(
+      "SELECT group_id, deadline FROM tasks WHERE id=$1",
+      [req.body.task_id]
+    );
+
+    if (!task.rows.length) {
+      return res
+        .status(400)
+        .json({ status: "error", msg: "task cannot be found" });
+    }
+
+    await client.query(
+      "DELETE FROM tasks WHERE group_id = $1 AND deadline >= $2",
+      [task.rows[0].group_id, task.rows[0].deadline]
+    );
+
+    await client.query("COMMIT");
     res.json({ status: "ok", msg: "following tasks deleted" });
   } catch (error) {
+    await client.query("ROLLBACK");
     console.error(error.message);
     res
       .status(400)
       .json({ status: "error", msg: "error deleting subsequent tasks" });
+  } finally {
+    client.release();
   }
 };
 
@@ -258,7 +309,9 @@ const updateTask = async (req, res) => {
 };
 
 const updateAllTasks = async (req, res) => {
+  const client = await db.connect();
   try {
+    await client.query("BEGIN");
     const {
       task_id,
       title,
@@ -269,7 +322,7 @@ const updateAllTasks = async (req, res) => {
       assigned_user,
     } = req.body;
 
-    const task = await db.query(
+    const task = await client.query(
       "SELECT tasks.id, tasks.title, tasks.deadline, tasks.modified_at, tasks.status, tasks.last_modified_by, tasks.assigned_user, tasks.group_id, task_groups.is_recurring, task_groups.is_rotate, task_groups.rule FROM tasks INNER JOIN task_groups ON tasks.group_id = task_groups.id WHERE tasks.id=$1",
       [task_id]
     );
@@ -280,7 +333,7 @@ const updateAllTasks = async (req, res) => {
         .json({ status: "error", msg: "non-recurring task" });
     }
 
-    const tasks = await db.query("SELECT * FROM tasks WHERE group_id=$1", [
+    const tasks = await client.query("SELECT * FROM tasks WHERE group_id=$1", [
       task.rows[0].group_id,
     ]);
 
@@ -315,7 +368,7 @@ const updateAllTasks = async (req, res) => {
             : assigned_user,
       };
 
-      await db.query(
+      await client.query(
         "UPDATE tasks set title=$1, deadline=$2, modified_at=$3, status=$4, last_modified_by=$5, assigned_user=$6 WHERE id=$7",
         [
           updated.title,
@@ -328,16 +381,21 @@ const updateAllTasks = async (req, res) => {
         ]
       );
     }
-
+    await client.query("COMMIT");
     res.json({ status: "ok", msg: "all tasks updated" });
   } catch (error) {
+    await client.query("ROLLBACK");
     console.error(error.message);
     res.status(400).json({ status: "error", msg: "error updating all tasks" });
+  } finally {
+    client.release();
   }
 };
 
 const updateFollowingTasks = async (req, res) => {
+  const client = await db.connect();
   try {
+    await client.query("BEGIN");
     const {
       task_id,
       title,
@@ -348,7 +406,7 @@ const updateFollowingTasks = async (req, res) => {
       assigned_user,
     } = req.body;
 
-    const task = await db.query(
+    const task = await client.query(
       "SELECT tasks.id, tasks.title, tasks.deadline, tasks.modified_at, tasks.status, tasks.last_modified_by, tasks.assigned_user, tasks.group_id, task_groups.is_recurring, task_groups.is_rotate, task_groups.rule FROM tasks INNER JOIN task_groups ON tasks.group_id = task_groups.id WHERE tasks.id=$1",
       [task_id]
     );
@@ -359,7 +417,7 @@ const updateFollowingTasks = async (req, res) => {
         .json({ status: "error", msg: "non-recurring task" });
     }
 
-    const tasks = await db.query(
+    const tasks = await client.query(
       "SELECT * FROM tasks WHERE group_id=$1 AND deadline >=$2",
       [task.rows[0].group_id, task.rows[0].deadline]
     );
@@ -395,7 +453,7 @@ const updateFollowingTasks = async (req, res) => {
             : assigned_user,
       };
 
-      await db.query(
+      await client.query(
         "UPDATE tasks set title=$1, deadline=$2, modified_at=$3, status=$4, last_modified_by=$5, assigned_user=$6 WHERE id=$7",
         [
           updated.title,
@@ -408,11 +466,14 @@ const updateFollowingTasks = async (req, res) => {
         ]
       );
     }
-
+    await client.query("COMMIT");
     res.json({ status: "ok", msg: "all tasks updated" });
   } catch (error) {
+    await client.query("ROLLBACK");
     console.error(error.message);
     res.status(400).json({ status: "error", msg: "error updating all tasks" });
+  } finally {
+    client.release();
   }
 };
 

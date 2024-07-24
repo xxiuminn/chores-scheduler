@@ -27,15 +27,6 @@ const validateDelTask = [
   body("task_id", "task_id is required").notEmpty().isInt(),
 ];
 
-const validateDelAllTasks = [
-  body("taskgroup_id", "task group id required").notEmpty().isInt(),
-];
-
-const validateDelFollowingTasks = [
-  body("taskgroup_id", "task group id required").notEmpty().isInt(),
-  body("deadline", "deadline is required").notEmpty().isDate(),
-];
-
 const validateUpdateTask = [
   body("task_id", "task id is required").notEmpty().isInt(),
 ];
@@ -46,7 +37,5 @@ module.exports = {
   validateGetTaskByUser,
   validateGetTask,
   validateDelTask,
-  validateDelAllTasks,
-  validateDelFollowingTasks,
   validateUpdateTask,
 };

@@ -19,13 +19,10 @@ const {
   validateGetTaskByUser,
   validateGetTask,
   validateDelTask,
-  validateDelAllTasks,
-  validateDelFollowingTasks,
   validateUpdateTask,
 } = require("../validators/tasks");
 
 const checkErrors = require("../validators/checkErrors");
-const { check } = require("express-validator");
 
 router.put("/create", validateCreateTaskGroup, checkErrors, createTaskGroup);
 router.post(
@@ -37,10 +34,10 @@ router.post(
 router.post("/user", validateGetTaskByUser, checkErrors, getTasksByUser);
 router.post("/task", validateGetTask, checkErrors, getTask);
 router.delete("/deleteone", validateDelTask, checkErrors, delTask);
-router.delete("/deleteall", validateDelAllTasks, checkErrors, delAllTasks);
+router.delete("/deleteall", validateDelTask, checkErrors, delAllTasks);
 router.delete(
   "/deletefollowing",
-  validateDelFollowingTasks,
+  validateDelTask,
   checkErrors,
   delFollowingTasks
 );

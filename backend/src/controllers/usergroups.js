@@ -26,8 +26,10 @@ const seedAccountTypes = async (req, res) => {
 // };
 
 const createUserGroup = async (req, res) => {
+  const client = await db.connect();
   try {
-    const userGroup = await db.query(
+    await client.query("BEGIN");
+    const userGroup = await client.query(
       "INSERT INTO user_groups(name, account_type) VALUES($1,$2) RETURNING id",
       [req.body.usergroup_name, req.body.account_type]
     );
@@ -37,23 +39,29 @@ const createUserGroup = async (req, res) => {
 
     console.log(userGroupId);
 
-    await db.query("UPDATE users SET group_id=$1 WHERE uuid=$2", [
+    await client.query("UPDATE users SET group_id=$1 WHERE uuid=$2", [
       userGroupId,
       req.body.uuid,
     ]);
-
+    await client.query("COMMIT");
     res.json({ status: "ok", msg: "user group created" });
   } catch (error) {
+    await client.query("ROLLOVER");
     console.error(error.message);
     res.status(400).json({ status: "error", msg: "error creating user group" });
+  } finally {
+    client.release();
   }
 };
 
 const updateAccountType = async (req, res) => {
+  const client = await db.connect();
   try {
-    const { rows } = await db.query("SELECT * FROM user_groups WHERE id=$1", [
-      req.body.usergroup_id,
-    ]);
+    await client.query("BEGIN");
+    const { rows } = await client.query(
+      "SELECT * FROM user_groups WHERE id=$1",
+      [req.body.usergroup_id]
+    );
 
     if (!rows.length) {
       return res
@@ -61,14 +69,18 @@ const updateAccountType = async (req, res) => {
         .json({ status: "error", msg: "user group id not valid" });
     }
 
-    await db.query("UPDATE user_groups SET account_type=$1 WHERE id=$2", [
+    await client.query("UPDATE user_groups SET account_type=$1 WHERE id=$2", [
       req.body.account_type,
       req.body.usergroup_id,
     ]);
+    await client.query("COMMIT");
     res.json({ status: "ok", msg: "account type updated" });
   } catch (error) {
+    await client.query("ROLLBACK");
     console.error(error.message);
     res.status(400).json({ status: "error", msg: "error updating user group" });
+  } finally {
+    client.release();
   }
 };
 

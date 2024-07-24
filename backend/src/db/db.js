@@ -8,6 +8,8 @@ const pool = new Pool({
   database: process.env.DATABASE,
 });
 
-module.exports = {
-  query: (text, params) => pool.query(text, params),
-};
+// module.exports = {
+//   query: (text, params) => pool.query(text, params),
+// };
+
+module.exports = pool;
