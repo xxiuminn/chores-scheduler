@@ -113,7 +113,7 @@ const Calendar = (props) => {
 
             <div
               className="offcanvas offcanvas-start"
-              tabIndex="-1"
+              tabindex="-1"
               id="offcanvas"
               aria-labelledby="offcanvas"
             >
