@@ -32,7 +32,7 @@ router.post(
   getTasksByUserGroup
 );
 router.post("/user", validateGetTaskByUser, checkErrors, getTasksByUser);
-router.post("/task", validateGetTask, checkErrors, getTask);
+router.get("/:task_id", validateGetTask, checkErrors, getTask);
 router.delete("/deleteone", validateDelTask, checkErrors, delTask);
 router.delete("/deleteall", validateDelTask, checkErrors, delAllTasks);
 router.delete(

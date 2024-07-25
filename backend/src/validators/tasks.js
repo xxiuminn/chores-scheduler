@@ -1,4 +1,4 @@
-const { body } = require("express-validator");
+const { body, param } = require("express-validator");
 
 const validateCreateTaskGroup = [
   body("usergroup_id", "user group id is required").notEmpty().isInt(),
@@ -26,7 +26,7 @@ const validateGetTaskByUser = [
 ];
 
 const validateGetTask = [
-  body("task_id", "task_id is required").notEmpty().isInt(),
+  param("task_id", "task_id is required").notEmpty().isInt(),
 ];
 
 const validateDelTask = [

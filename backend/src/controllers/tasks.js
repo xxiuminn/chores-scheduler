@@ -122,7 +122,7 @@ const createTaskGroup = async (req, res) => {
 const getTasksByUserGroup = async (req, res) => {
   try {
     const tasks = await db.query(
-      "SELECT users.group_id, tasks.id, tasks.title, tasks.deadline, tasks.assigned_user, tasks.group_id FROM users INNER JOIN tasks ON tasks.assigned_user = users.uuid WHERE users.group_id = $1",
+      "SELECT users.group_id, users.name, tasks.id, tasks.title, tasks.deadline, tasks.status, tasks.assigned_user, tasks.group_id FROM users INNER JOIN tasks ON tasks.assigned_user = users.uuid WHERE users.group_id = $1",
       [req.body.usergroup_id]
     );
     res.json(tasks.rows);
@@ -153,8 +153,8 @@ const getTasksByUser = async (req, res) => {
 const getTask = async (req, res) => {
   try {
     const task = await db.query(
-      "SELECT tasks.id, tasks.title, tasks.deadline, tasks.assigned_user, tasks.assigned_user, tasks.status, task_groups.is_recurring, task_groups.is_rotate, task_groups.rule FROM tasks INNER JOIN task_groups ON tasks.group_id = task_groups.id WHERE tasks.id = $1",
-      [req.body.task_id]
+      "SELECT tasks.id, tasks.title, tasks.deadline, tasks.assigned_user, tasks.created_by, tasks.status, task_groups.is_recurring, task_groups.is_rotate, task_groups.rule FROM tasks INNER JOIN task_groups ON tasks.group_id = task_groups.id WHERE tasks.id = $1",
+      [req.params.task_id]
     );
 
     if (!task.rows.length) {
