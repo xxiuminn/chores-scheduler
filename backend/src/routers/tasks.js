@@ -41,9 +41,9 @@ router.delete(
   checkErrors,
   delFollowingTasks
 );
-router.post("/updateone", validateUpdateTask, checkErrors, updateTask);
-router.post("/updateall", validateUpdateTask, checkErrors, updateAllTasks);
-router.post(
+router.patch("/updateone", validateUpdateTask, checkErrors, updateTask);
+router.patch("/updateall", validateUpdateTask, checkErrors, updateAllTasks);
+router.patch(
   "/updatefollowing",
   validateUpdateTask,
   checkErrors,

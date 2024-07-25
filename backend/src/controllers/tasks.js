@@ -169,19 +169,46 @@ const getTask = async (req, res) => {
 };
 
 const delTask = async (req, res) => {
+  const client = await db.connect();
   try {
-    const task = await db.query("DELETE FROM tasks WHERE id = $1", [
-      req.body.task_id,
+    await client.query("BEGIN");
+
+    const taskGroup = await client.query(
+      "SELECT group_id FROM tasks WHERE id=$1",
+      [req.body.task_id]
+    );
+
+    const groupTaskId = taskGroup.rows[0].group_id;
+    console.log(groupTaskId);
+
+    const task = await client.query("SELECT * FROM tasks WHERE group_id=$1", [
+      groupTaskId,
     ]);
+
     if (!task.rows.length) {
       return res
         .status(400)
         .json({ status: "error", msg: "task cannot be found" });
     }
+
+    if (task.rows.length === 1) {
+      await client.query("DELETE FROM tasks WHERE group_id = $1", [
+        groupTaskId,
+      ]);
+      await client.query("DELETE FROM task_groups WHERE id = $1", [
+        groupTaskId,
+      ]);
+    } else
+      await client.query("DELETE FROM tasks WHERE id=$1", [req.body.task_id]);
+
+    await client.query("COMMIT");
     res.json({ status: "ok", msg: "task deleted" });
   } catch (error) {
+    await client.query("ROLLBACK");
     console.error(error.message);
     res.status(400).json({ status: "error", msg: "error deleting task" });
+  } finally {
+    client.release();
   }
 };
 
