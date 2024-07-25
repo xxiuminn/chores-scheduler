@@ -68,18 +68,6 @@ const AddTaskModal = (props) => {
     // console.log(data);
   }, [data]);
 
-  console.log(
-    isRecurring,
-    title,
-    deadline,
-    assignedUser,
-    claims.uuid,
-    isRotate,
-    rule,
-    claims.group_id,
-    accessToken
-  );
-
   const { mutate } = useMutation({
     mutationFn: async () =>
       await fetchData(
