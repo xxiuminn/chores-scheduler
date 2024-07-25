@@ -21,12 +21,16 @@ const EditTaskModal = (props) => {
         useCtx.accessToken
       );
     },
-    onSuccess: () => queryClient.invalidateQueries(["task", deleteType]),
+    onSuccess: () => {
+      queryClient.invalidateQueries(["tasks"]);
+      console.log("delete success");
+      setDeleteType("");
+    },
   });
 
-  const handleDel = (value) => {
-    // e.preventDefault();
-    setDeleteType(value);
+  const handleDelete = (e) => {
+    e.preventDefault();
+    delTask();
   };
 
   return (
@@ -110,7 +114,7 @@ const EditTaskModal = (props) => {
                   <form
                     className="d-flex flex-column justify-content-center align-items-center needs-validation"
                     novalidate
-                    onSubmit={delTask}
+                    onSubmit={handleDelete}
                   >
                     <label className="form-label mt-2">
                       How would you like to delete your chore?
@@ -125,7 +129,7 @@ const EditTaskModal = (props) => {
                           value="deleteone"
                           required
                           checked={deleteType === "deleteone"}
-                          onChange={() => handleDel("deleteone")}
+                          onChange={() => setDeleteType("deleteone")}
                         />
                         <label className="form-check-label" htmlFor="deleteone">
                           This chore only
@@ -143,7 +147,7 @@ const EditTaskModal = (props) => {
                               value="deletefollowing"
                               required
                               checked={deleteType === "deletefollowing"}
-                              onChange={() => handleDel("deletefollowing")}
+                              onChange={() => setDeleteType("deletefollowing")}
                             />
                             <label
                               className="form-check-label"
@@ -162,7 +166,7 @@ const EditTaskModal = (props) => {
                               value="deleteall"
                               required
                               checked={deleteType === "deleteall"}
-                              onChange={() => handleDel("deleteall")}
+                              onChange={() => setDeleteType("deleteall")}
                             />
                             <label
                               className="form-check-label"
