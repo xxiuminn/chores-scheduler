@@ -1,6 +1,6 @@
 import React, { useContext, useState } from "react";
 import styles from "./Calendar.module.css";
-import EditTaskModal from "./EditTaskModal";
+import DelTaskModal from "./DelTaskModal";
 import useFetch from "../hooks/useFetch";
 import { useQuery } from "@tanstack/react-query";
 import UserContext from "../context/user";
@@ -45,7 +45,7 @@ const TaskCards = (props) => {
       </div>
 
       {isSuccess && openTaskModal && (
-        <EditTaskModal data={data} handleOpenModal={handleOpenModal} />
+        <DelTaskModal data={data} handleOpenModal={handleOpenModal} />
       )}
     </>
   );

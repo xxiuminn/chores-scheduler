@@ -1,197 +1,194 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import React, { useContext, useState } from "react";
-import useFetch from "../hooks/useFetch";
-import UserContext from "../context/user";
+import React from "react";
 
 const EditTaskModal = (props) => {
-  const fetchData = useFetch();
-  const useCtx = useContext(UserContext);
-  const [openAlert, setOpenAlert] = useState(false);
-  const [deleteType, setDeleteType] = useState("");
-  const queryClient = useQueryClient();
-
-  const { mutate: delTask } = useMutation({
-    mutationFn: async () => {
-      await fetchData(
-        "/tasks/" + deleteType,
-        "DELETE",
-        {
-          task_id: props.data.id,
-        },
-        useCtx.accessToken
-      );
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries(["tasks"]);
-      console.log("delete success");
-      setDeleteType("");
-    },
-  });
-
-  const handleDelete = (e) => {
-    e.preventDefault();
-    delTask();
-  };
-
   return (
     <>
       {/* <div
         className="modal fade"
-        id="viewtaskmodal"
+        id="addtaskmodal"
         tabindex="-1"
-        aria-labelledby="viewtaskmodal"
+        aria-labelledby="addtaskmodal"
         aria-hidden="true"
       > */}
 
-      {!openAlert && (
-        // modal to view task
-        <>
-          <div>
-            <div
-              className="modal fade show d-block"
-              tabIndex="-1"
-              aria-hidden="true"
+      <div className="modal fade show d-block" tabIndex="-1" aria-hidden="true">
+        <div className="modal-dialog modal-dialog-centered">
+          <div className="modal-content">
+            <div className="d-flex flex-column justify-content-between align-items-center">
+              <button
+                type="button"
+                className="btn-close align-self-end me-3 mt-3"
+                // data-bs-dismiss="modal"
+                onClick={props.handleEditModal}
+                aria-label="Close"
+              ></button>
+              <h1 className="modal-title">Argh another chore</h1>
+            </div>
+
+            <form
+              className="d-flex justify-content-center align-items-center needs-validation"
+              novalidate
+              // onSubmit={handleSubmit}
             >
-              <div className="modal-dialog modal-dialog-centered">
-                <div className="modal-content">
-                  <div className="d-flex flex-column justify-content-between align-items-center">
-                    <button
-                      type="button"
-                      className="btn-close align-self-end me-3 mt-3"
-                      onClick={props.handleOpenModal}
-                      // data-bs-dismiss="modal"
-                      aria-label="Close"
-                    ></button>
-                  </div>
-
-                  <div className="d-flex flex-column justify-content-center align-items-start m-3">
-                    <div>{props.data.title}</div>
-                    <div className="mt-3">{props.data.assigned_user}</div>
-                    <div>{props.data.deadline}</div>
-                    <div>{props.data.status}</div>
-                    <div>{props.data.created_by}</div>
-                    <div>{props.data.rule}</div>
-                    <div className="d-flex mt-3">
-                      <div type="button">
-                        <i
-                          className="bi bi-trash3"
-                          onClick={() => setOpenAlert(true)}
-                        ></i>
-                      </div>
-                      <div type="button" className="mx-3">
-                        <i className="bi bi-pencil"></i>
-                      </div>
-                    </div>
+              <div className="d-flex flex-column justify-content-center align-items-start">
+                <div className="mt-2">
+                  <label htmlFor="chore-name" className="form-label">
+                    Chore Title
+                  </label>
+                  <input
+                    type="text"
+                    className="form-control"
+                    id="chore-name"
+                    required
+                    // onChange={(e) => setTitle(e.target.value)}
+                    // value={title}
+                  ></input>
+                  <div id="instruction1" className="form-text">
+                    Include a title below 50 characters.
                   </div>
                 </div>
-              </div>
-            </div>
-          </div>
-          <div className="modal-backdrop fade show"></div>
-        </>
-      )}
 
-      {openAlert && (
-        // modal to confirm delete
-        <>
-          <div
-            className="modal fade show d-block"
-            tabIndex="-1"
-            aria-hidden="true"
-          >
-            <div className="modal-dialog modal-dialog-centered">
-              <div className="modal-content">
-                <div className="d-flex flex-column justify-content-between align-items-center">
-                  <button
-                    type="button"
-                    className="btn-close align-self-end me-3 mt-3"
-                    onClick={() => setOpenAlert(false)}
-                    // data-bs-dismiss="modal"
-                    aria-label="Close"
-                  ></button>
-                  <h1 className="modal-title">Delete Recurring Chore</h1>
+                <div className="mt-2">
+                  <label htmlFor="date" className="form-label">
+                    Date
+                  </label>
+                  <input
+                    type="date"
+                    className="form-control"
+                    id="date"
+                    required
+                    // value={deadline}
+                    // onChange={(e) => setDeadline(e.target.value)}
+                  ></input>
+                  <div id="instruction2" className="form-text">
+                    When the chore should be completed by.
+                  </div>
+                </div>
 
-                  <form
-                    className="d-flex flex-column justify-content-center align-items-center needs-validation"
-                    novalidate
-                    onSubmit={handleDelete}
-                  >
-                    <label className="form-label mt-2">
-                      How would you like to delete your chore?
+                <label className="form-label mt-2">Schedule Chore</label>
+                <div>
+                  <div className="form-check form-check-inline">
+                    <input
+                      className="form-check-input"
+                      type="radio"
+                      name="frequency"
+                      id="once"
+                      value="once"
+                      required
+                      // checked={schedule === "ONCE"}
+                      // onChange={() => handleRecurringRule("ONCE")}
+                    />
+                    <label className="form-check-label" htmlFor="once">
+                      Once
                     </label>
-                    <div>
-                      <div className="form-check form-check">
-                        <input
-                          className="form-check-input"
-                          type="radio"
-                          name="delchore"
-                          id="deleteone"
-                          value="deleteone"
-                          required
-                          checked={deleteType === "deleteone"}
-                          onChange={() => setDeleteType("deleteone")}
-                        />
-                        <label className="form-check-label" htmlFor="deleteone">
-                          This chore only
-                        </label>
-                      </div>
+                  </div>
 
-                      {props.data.is_recurring && (
-                        <>
-                          <div className="form-check form-check">
-                            <input
-                              className="form-check-input"
-                              type="radio"
-                              name="delchore"
-                              id="deletefollowing"
-                              value="deletefollowing"
-                              required
-                              checked={deleteType === "deletefollowing"}
-                              onChange={() => setDeleteType("deletefollowing")}
-                            />
-                            <label
-                              className="form-check-label"
-                              htmlFor="deletefollowing"
-                            >
-                              This and following chores
-                            </label>
-                          </div>
+                  <div className="form-check form-check-inline">
+                    <input
+                      className="form-check-input"
+                      type="radio"
+                      name="frequency"
+                      id="daily"
+                      value="daily"
+                      required
+                      // checked={schedule === "DAILY"}
+                      // onChange={() => handleRecurringRule("DAILY")}
+                    />
+                    <label className="form-check-label" htmlFor="daily">
+                      Daily
+                    </label>
+                  </div>
 
-                          <div className="form-check form-check">
-                            <input
-                              className="form-check-input"
-                              type="radio"
-                              name="delchore"
-                              id="deleteall"
-                              value="deleteall"
-                              required
-                              checked={deleteType === "deleteall"}
-                              onChange={() => setDeleteType("deleteall")}
-                            />
-                            <label
-                              className="form-check-label"
-                              htmlFor="deleteall"
-                            >
-                              All chores
-                            </label>
-                          </div>
-                        </>
-                      )}
-                      <button
-                        className="mt-4 mb-5 align-self-center"
-                        type="submit"
-                      >
-                        Delete
-                      </button>
-                    </div>
-                  </form>
+                  <div className="form-check form-check-inline">
+                    <input
+                      className="form-check-input"
+                      type="radio"
+                      name="frequency"
+                      id="weekly"
+                      value="weekly"
+                      required
+                      // checked={schedule === "WEEKLY"}
+                      // onChange={() => handleRecurringRule("WEEKLY")}
+                    />
+                    <label className="form-check-label" htmlFor="weekly">
+                      Weekly
+                    </label>
+                  </div>
+                  <div id="instruction3" className="form-text">
+                    Repeat your chore if needed.
+                  </div>
                 </div>
+
+                {/* {isRecurring === 1 && ( */}
+                <>
+                  <label className="form-label mt-2">Rotate</label>
+                  <div>
+                    <div className="form-check form-check-inline">
+                      <input
+                        className="form-check-input"
+                        type="radio"
+                        name="rotate"
+                        id="no"
+                        // value={0}
+                        // onChange={(e) =>
+                        //   setIsRotate(parseInt(e.target.value))
+                        // }
+                        required
+                      />
+                      <label className="form-check-label" htmlFor="no">
+                        No
+                      </label>
+                    </div>
+
+                    <div className="form-check form-check-inline">
+                      <input
+                        className="form-check-input"
+                        type="radio"
+                        name="rotate"
+                        id="yes"
+                        // value={1}
+                        // onChange={(e) =>
+                        //   setIsRotate(parseInt(e.target.value))
+                        // }
+                        required
+                      />
+                      <label className="form-check-label" htmlFor="yes">
+                        Yes
+                      </label>
+                    </div>
+                    <div id="instruction4" className="form-text">
+                      Rotate chore among your members.
+                    </div>
+                  </div>
+                </>
+                {/* )} */}
+
+                <label className="form-label mt-2">Assign Member</label>
+                <select
+                  className="form-select"
+                  aria-label=".form-select members"
+                  required
+                  // onChange={(e) => setAssignedUser(e.target.value)}
+                  // value={assignedUser}
+                >
+                  <option value="" disabled selected>
+                    Pick a member
+                  </option>
+                  {/* {isSuccess &&
+                    data.map((member) => {
+                      return <option value={member.uuid}>{member.name}</option>;
+                    })} */}
+                </select>
+
+                <button className="mt-4 mb-5 align-self-center" type="submit">
+                  Save Changes
+                </button>
               </div>
-            </div>
+            </form>
           </div>
-          <div className="modal-backdrop fade show"></div>
-        </>
-      )}
+        </div>
+      </div>
+      <div className="modal-backdrop fade show"></div>
     </>
   );
 };
