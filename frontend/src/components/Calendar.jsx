@@ -251,7 +251,6 @@ const Calendar = (props) => {
                         modalDate={modalDate}
                         closeModal={closeModal}
                       />
-
                       {tasks.map((task) => {
                         if (
                           new Date(task.deadline).toLocaleDateString() ===
@@ -266,7 +265,6 @@ const Calendar = (props) => {
               })
             )}
           </div>
-          <div className="tasks"></div>
         </div>
       </div>
     </>

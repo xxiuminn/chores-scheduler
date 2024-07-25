@@ -4,7 +4,7 @@
   min-height: 100vh;
   width: 100vw;
   padding: 1em 2em 1em 2em;
-  background-color: bisque;
+  background-color: rgb(255, 255, 255);
 }
 
 .topnav,
@@ -27,7 +27,7 @@
   grid-template-columns: repeat(auto-fit, minmax(10em, 1fr));
   gap: 1em;
   width: 100%;
-  align-items: center;
+  align-items: start;
   justify-items: center;
 }
 
@@ -84,3 +84,18 @@ a {
   background-color: rgba(234, 176, 101, 0.2);
   color: black;
 }
+
+.taskCard {
+  background-color: bisque;
+  border-radius: 1em;
+  padding: 1em;
+  width: 10em;
+  overflow-x: auto;
+}
+
+/* 
+.task {
+  position: relative;
+  max-height: 50vh;
+  overflow-y: auto;
+} */
