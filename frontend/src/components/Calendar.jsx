@@ -1,12 +1,22 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import styles from "./Calendar.module.css";
 import AddTaskModal from "./AddTaskModal";
+import useFetch from "../hooks/useFetch";
+import { useQuery } from "@tanstack/react-query";
+import { jwtDecode } from "jwt-decode";
+import UserContext from "../context/user";
+import TaskCards from "./TaskCards";
 
 const Calendar = (props) => {
+  const useCtx = useContext(UserContext);
+  const fetchData = useFetch();
+  const claims = jwtDecode(useCtx.accessToken);
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [year, setYear] = useState(selectedDate.getFullYear());
   const [monthIndex, setMonthIndex] = useState(selectedDate.getMonth());
   const [modalDate, setModalDate] = useState("");
+  const [show, setShow] = useState(false);
+  const [tasks, setTasks] = useState([]);
 
   const daysInWeek = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
@@ -94,6 +104,30 @@ const Calendar = (props) => {
         "-" +
         fulldate.split("/")[0]
     );
+  };
+
+  const { data } = useQuery({
+    queryKey: ["tasks"],
+    queryFn: async () => {
+      return await fetchData(
+        "/tasks/usergroup",
+        "POST",
+        {
+          usergroup_id: claims.group_id,
+        },
+        useCtx.accessToken
+      );
+    },
+  });
+
+  useEffect(() => {
+    if (data) {
+      setTasks(data);
+    }
+  }, [data]);
+
+  const closeModal = () => {
+    setShow(!show);
   };
 
   return (
@@ -209,16 +243,30 @@ const Calendar = (props) => {
                         data-bs-target="#addtaskmodal"
                         className={styles.addtask}
                         onClick={() => handleModalDate(item.fullDate)}
+                        closeModal={closeModal}
                       >
                         <i className="bi bi-plus"></i> Add Task
                       </button>
-                      <AddTaskModal modalDate={modalDate} />
+                      <AddTaskModal
+                        modalDate={modalDate}
+                        closeModal={closeModal}
+                      />
+
+                      {tasks.map((task) => {
+                        if (
+                          new Date(task.deadline).toLocaleDateString() ===
+                          item.fullDate.toLocaleDateString().split("T")[0]
+                        ) {
+                          return <TaskCards task={task} />;
+                        }
+                      })}
                     </div>
                   );
                 }
               })
             )}
           </div>
+          <div className="tasks"></div>
         </div>
       </div>
     </>
