@@ -1,4 +1,4 @@
-const { body } = require("express-validator");
+const { body, param } = require("express-validator");
 
 const validateCreateUserGroup = [
   body("usergroup_name", "usergroup name required").notEmpty().isString(),
@@ -12,7 +12,7 @@ const validateUpdateAccountType = [
 ];
 
 const validateGetGroupMembers = [
-  body("usergroup_id", "user group id required").notEmpty().isInt(),
+  param("usergroup_id", "user group id required").notEmpty().isInt(),
 ];
 module.exports = {
   validateCreateUserGroup,
