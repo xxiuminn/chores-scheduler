@@ -118,7 +118,7 @@ const DelTaskModal = (props) => {
                     // data-bs-dismiss="modal"
                     aria-label="Close"
                   ></button>
-                  <h1 className="modal-title">Delete Recurring Chore</h1>
+                  <h1 className="modal-title">Delete Chore</h1>
 
                   <form
                     className="d-flex flex-column justify-content-center align-items-center needs-validation"
@@ -203,7 +203,12 @@ const DelTaskModal = (props) => {
       )}
 
       {openEditForm && (
-        <EditTaskModal data={props.data} handleEditModal={handleEditModal} />
+        <EditTaskModal
+          data={props.data}
+          task={props.task}
+          handleEditModal={handleEditModal}
+          members={props.members}
+        />
       )}
     </>
   );
