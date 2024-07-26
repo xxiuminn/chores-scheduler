@@ -1,16 +1,59 @@
-import React from "react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import React, { useContext, useState } from "react";
+import useFetch from "../hooks/useFetch";
+import UserContext from "../context/user";
+import { jwtDecode } from "jwt-decode";
 
 const EditTaskModal = (props) => {
-  return (
-    <>
-      {/* <div
-        className="modal fade"
-        id="addtaskmodal"
-        tabindex="-1"
-        aria-labelledby="addtaskmodal"
-        aria-hidden="true"
-      > */}
+  const fetchData = useFetch();
+  const useCtx = useContext(UserContext);
+  const queryClient = useQueryClient();
+  const [title, setTitle] = useState(props.data.title);
+  const [status, setStatus] = useState(props.data.status);
+  const [updateType, setUpdateType] = useState("");
+  const formattedDeadline = new Date(props.data.deadline).toLocaleDateString();
+  const [deadline, setDeadline] = useState(
+    formattedDeadline.split("/")[2] +
+      "-" +
+      formattedDeadline.split("/")[1] +
+      "-" +
+      formattedDeadline.split("/")[0]
+  );
 
+  const [assignedUser, setAssignedUser] = useState(props.data.assigned_user);
+  // console.log(props.task.id);
+
+  const { mutate } = useMutation({
+    mutationFn: async () => {
+      await fetchData(
+        "/tasks/" + updateType,
+        "PATCH",
+        {
+          title,
+          deadline,
+          assigned_user: assignedUser,
+          status,
+          task_id: props.data.id,
+          last_modified_by: jwtDecode(useCtx.accessToken).uuid,
+        },
+        useCtx.accessToken
+      );
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries(["tasks"]);
+      console.log("update successful");
+      props.handleEditModal();
+    },
+  });
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    mutate();
+  };
+
+  return (
+    // edit chore modal
+    <>
       <div className="modal fade show d-block" tabIndex="-1" aria-hidden="true">
         <div className="modal-dialog modal-dialog-centered">
           <div className="modal-content">
@@ -22,13 +65,13 @@ const EditTaskModal = (props) => {
                 onClick={props.handleEditModal}
                 aria-label="Close"
               ></button>
-              <h1 className="modal-title">Argh another chore</h1>
+              <h1 className="modal-title">Edit chore</h1>
             </div>
 
             <form
               className="d-flex justify-content-center align-items-center needs-validation"
               novalidate
-              // onSubmit={handleSubmit}
+              onSubmit={handleSubmit}
             >
               <div className="d-flex flex-column justify-content-center align-items-start">
                 <div className="mt-2">
@@ -40,8 +83,8 @@ const EditTaskModal = (props) => {
                     className="form-control"
                     id="chore-name"
                     required
-                    // onChange={(e) => setTitle(e.target.value)}
-                    // value={title}
+                    onChange={(e) => setTitle(e.target.value)}
+                    value={title}
                   ></input>
                   <div id="instruction1" className="form-text">
                     Include a title below 50 characters.
@@ -57,129 +100,99 @@ const EditTaskModal = (props) => {
                     className="form-control"
                     id="date"
                     required
-                    // value={deadline}
-                    // onChange={(e) => setDeadline(e.target.value)}
+                    value={deadline}
+                    onChange={(e) => setDeadline(e.target.value)}
                   ></input>
                   <div id="instruction2" className="form-text">
                     When the chore should be completed by.
                   </div>
                 </div>
 
-                <label className="form-label mt-2">Schedule Chore</label>
-                <div>
-                  <div className="form-check form-check-inline">
-                    <input
-                      className="form-check-input"
-                      type="radio"
-                      name="frequency"
-                      id="once"
-                      value="once"
-                      required
-                      // checked={schedule === "ONCE"}
-                      // onChange={() => handleRecurringRule("ONCE")}
-                    />
-                    <label className="form-check-label" htmlFor="once">
-                      Once
-                    </label>
-                  </div>
-
-                  <div className="form-check form-check-inline">
-                    <input
-                      className="form-check-input"
-                      type="radio"
-                      name="frequency"
-                      id="daily"
-                      value="daily"
-                      required
-                      // checked={schedule === "DAILY"}
-                      // onChange={() => handleRecurringRule("DAILY")}
-                    />
-                    <label className="form-check-label" htmlFor="daily">
-                      Daily
-                    </label>
-                  </div>
-
-                  <div className="form-check form-check-inline">
-                    <input
-                      className="form-check-input"
-                      type="radio"
-                      name="frequency"
-                      id="weekly"
-                      value="weekly"
-                      required
-                      // checked={schedule === "WEEKLY"}
-                      // onChange={() => handleRecurringRule("WEEKLY")}
-                    />
-                    <label className="form-check-label" htmlFor="weekly">
-                      Weekly
-                    </label>
-                  </div>
-                  <div id="instruction3" className="form-text">
-                    Repeat your chore if needed.
-                  </div>
-                </div>
-
-                {/* {isRecurring === 1 && ( */}
-                <>
-                  <label className="form-label mt-2">Rotate</label>
-                  <div>
-                    <div className="form-check form-check-inline">
-                      <input
-                        className="form-check-input"
-                        type="radio"
-                        name="rotate"
-                        id="no"
-                        // value={0}
-                        // onChange={(e) =>
-                        //   setIsRotate(parseInt(e.target.value))
-                        // }
-                        required
-                      />
-                      <label className="form-check-label" htmlFor="no">
-                        No
-                      </label>
-                    </div>
-
-                    <div className="form-check form-check-inline">
-                      <input
-                        className="form-check-input"
-                        type="radio"
-                        name="rotate"
-                        id="yes"
-                        // value={1}
-                        // onChange={(e) =>
-                        //   setIsRotate(parseInt(e.target.value))
-                        // }
-                        required
-                      />
-                      <label className="form-check-label" htmlFor="yes">
-                        Yes
-                      </label>
-                    </div>
-                    <div id="instruction4" className="form-text">
-                      Rotate chore among your members.
-                    </div>
-                  </div>
-                </>
-                {/* )} */}
-
                 <label className="form-label mt-2">Assign Member</label>
                 <select
                   className="form-select"
                   aria-label=".form-select members"
                   required
-                  // onChange={(e) => setAssignedUser(e.target.value)}
-                  // value={assignedUser}
+                  onChange={(e) => setAssignedUser(e.target.value)}
+                  value={assignedUser}
                 >
-                  <option value="" disabled selected>
-                    Pick a member
-                  </option>
-                  {/* {isSuccess &&
-                    data.map((member) => {
-                      return <option value={member.uuid}>{member.name}</option>;
-                    })} */}
+                  {props.members.map((member) => {
+                    return <option value={member.uuid}>{member.name}</option>;
+                  })}
                 </select>
 
+                <label className="form-label mt-2">Status</label>
+                <select
+                  className="form-select"
+                  aria-label=".form-select status"
+                  required
+                  onChange={(e) => setStatus(e.target.value)}
+                  value={status}
+                >
+                  {["IN PROGRESS", "COMPLETED"].map((state) => {
+                    return <option value={state}>{state}</option>;
+                  })}
+                </select>
+
+                <label className="form-label mt-2">
+                  How would you like to edit your chore?
+                </label>
+                <div>
+                  <div className="form-check form-check">
+                    <input
+                      className="form-check-input"
+                      type="radio"
+                      name="updatechore"
+                      id="updateone"
+                      value="updateone"
+                      required
+                      checked={updateType === "updateone"}
+                      onChange={() => setUpdateType("updateone")}
+                    />
+                    <label className="form-check-label" htmlFor="updateone">
+                      This chore only
+                    </label>
+                  </div>
+
+                  {props.data.is_recurring && (
+                    <>
+                      <div className="form-check form-check">
+                        <input
+                          className="form-check-input"
+                          type="radio"
+                          name="updatechore"
+                          id="updatefollowing"
+                          value="updatefollowing"
+                          required
+                          checked={updateType === "updatefollowing"}
+                          onChange={() => setUpdateType("updatefollowing")}
+                        />
+                        <label
+                          className="form-check-label"
+                          htmlFor="updatefollowing"
+                        >
+                          This and following chores
+                        </label>
+                      </div>
+
+                      <div className="form-check form-check">
+                        <input
+                          className="form-check-input"
+                          type="radio"
+                          name="updatechore"
+                          id="updateall"
+                          value="updateall"
+                          required
+                          checked={updateType === "updateall"}
+                          onChange={() => setUpdateType("updateall")}
+                        />
+                        <label className="form-check-label" htmlFor="updateall">
+                          All chores
+                        </label>
+                      </div>
+                    </>
+                  )}
+                </div>
                 <button className="mt-4 mb-5 align-self-center" type="submit">
                   Save Changes
                 </button>
