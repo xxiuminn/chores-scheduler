@@ -91,6 +91,16 @@ a {
   padding: 1em;
   width: 10em;
   overflow-x: auto;
+  cursor: pointer;
+}
+
+.taskCardCompleted {
+  background-color: rgb(200, 234, 200);
+  border-radius: 1em;
+  padding: 1em;
+  width: 10em;
+  overflow-x: auto;
+  cursor: pointer;
 }
 
 /* 
