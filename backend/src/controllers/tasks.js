@@ -122,7 +122,7 @@ const createTaskGroup = async (req, res) => {
 const getTasksByUserGroup = async (req, res) => {
   try {
     const tasks = await db.query(
-      "SELECT users.group_id, users.name, tasks.id, tasks.title, tasks.deadline, tasks.status, tasks.assigned_user, tasks.group_id FROM users INNER JOIN tasks ON tasks.assigned_user = users.uuid WHERE users.group_id = $1",
+      "SELECT users.group_id, users.name, tasks.id, tasks.title, tasks.deadline, tasks.status, tasks.assigned_user, tasks.group_id FROM users INNER JOIN tasks ON tasks.assigned_user = users.uuid WHERE users.group_id = $1 ORDER BY tasks.status DESC",
       [req.body.usergroup_id]
     );
     res.json(tasks.rows);
@@ -285,17 +285,16 @@ const delFollowingTasks = async (req, res) => {
 const updateTask = async (req, res) => {
   try {
     const {
+      task_id,
       title,
       deadline,
-      date_modified,
+      // date_modified,
       status,
       last_modified_by,
       assigned_user,
     } = req.body;
 
-    const task = await db.query("SELECT * FROM tasks WHERE id=$1", [
-      req.body.task_id,
-    ]);
+    const task = await db.query("SELECT * FROM tasks WHERE id=$1", [task_id]);
 
     if (!task.rows.length) {
       return res.status(400).json({ status: "error", msg: "task not found" });
@@ -305,27 +304,32 @@ const updateTask = async (req, res) => {
     console.log(taskInfo);
 
     const updated = {
-      title: title === undefined ? taskInfo.title : title,
-      deadline: deadline === undefined ? taskInfo.deadline : deadline,
-      date_modified:
-        date_modified === undefined ? taskInfo.date_modified : date_modified,
-      status: status === undefined ? taskInfo.status : status,
-      last_modified_by:
-        last_modified_by === undefined
-          ? taskInfo.last_modified_by
-          : last_modified_by,
+      title: title === (undefined || taskInfo.title) ? taskInfo.title : title,
+      deadline:
+        deadline === (undefined || taskInfo.deadline)
+          ? taskInfo.deadline
+          : deadline,
+      modified_at: new Date(),
+      // date_modified === undefined ? taskInfo.date_modified : date_modified,
+      status:
+        status === (undefined || taskInfo.status) ? taskInfo.status : status,
+      last_modified_by: last_modified_by,
       assigned_user:
-        assigned_user === undefined ? taskInfo.assigned_user : assigned_user,
+        assigned_user === (undefined || taskInfo.assigned_user)
+          ? taskInfo.assigned_user
+          : assigned_user,
     };
 
     await db.query(
-      "UPDATE tasks set title=$1, deadline=$2, date_modified=$3, status=$4, last_modified_by=$5, assigned_user=$6",
+      "UPDATE tasks set title=$1, deadline=$2, modified_at=$3, status=$4, last_modified_by=$5, assigned_user=$6 WHERE id=$7",
       [
         updated.title,
         updated.deadline,
+        updated.modified_at,
         updated.status,
         updated.last_modified_by,
         updated.assigned_user,
+        task_id,
       ]
     );
     res.json({ status: "ok", msg: "task updated" });
@@ -343,7 +347,6 @@ const updateAllTasks = async (req, res) => {
       task_id,
       title,
       deadline,
-      modified_at,
       status,
       last_modified_by,
       assigned_user,
@@ -382,8 +385,7 @@ const updateAllTasks = async (req, res) => {
       const updated = {
         title: title === undefined ? taskArr[i].title : title,
         deadline: deadline === undefined ? taskArr[i].deadline : newDeadline(),
-        modified_at:
-          modified_at === undefined ? taskArr[i].modified_at : modified_at,
+        modified_at: new Date(),
         status: status === undefined ? taskArr[i].status : status,
         last_modified_by:
           last_modified_by === undefined
