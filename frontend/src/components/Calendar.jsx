@@ -17,6 +17,7 @@ const Calendar = (props) => {
   const [modalDate, setModalDate] = useState("");
   const [show, setShow] = useState(false);
   const [tasks, setTasks] = useState([]);
+  const [members, setMembers] = useState([]);
 
   const daysInWeek = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
@@ -104,11 +105,15 @@ const Calendar = (props) => {
         "-" +
         fulldate.split("/")[0]
     );
+    setShow(true);
   };
+
+  // fetch tasks by user groups
 
   const { data } = useQuery({
     queryKey: ["tasks"],
     queryFn: async () => {
+      console.log("start fetch tasks");
       return await fetchData(
         "/tasks/usergroup",
         "POST",
@@ -129,6 +134,27 @@ const Calendar = (props) => {
   const closeModal = () => {
     setShow(!show);
   };
+
+  // fetch members of user group
+  const { data: membersData } = useQuery({
+    queryKey: ["members"],
+    queryFn: async () => {
+      "start fetch members";
+      return await fetchData(
+        "/usergroups/members/" + claims.group_id,
+        undefined,
+        undefined,
+        useCtx.accessToken
+      );
+    },
+  });
+
+  useEffect(() => {
+    if (membersData) {
+      console.log(membersData);
+      setMembers(membersData);
+    }
+  }, [membersData]);
 
   return (
     <>
@@ -239,24 +265,29 @@ const Calendar = (props) => {
                       </div>
                       <button
                         type="button"
-                        data-bs-toggle="modal"
-                        data-bs-target="#addtaskmodal"
+                        // data-bs-toggle="modal"
+                        // data-bs-target="#addtaskmodal"
                         className={styles.addtask}
                         onClick={() => handleModalDate(item.fullDate)}
                         closeModal={closeModal}
                       >
                         <i className="bi bi-plus"></i> Add Task
                       </button>
-                      <AddTaskModal
-                        modalDate={modalDate}
-                        closeModal={closeModal}
-                      />
+                      {show && (
+                        <AddTaskModal
+                          modalDate={modalDate}
+                          closeModal={closeModal}
+                          members={membersData}
+                        />
+                      )}
                       {tasks.map((task) => {
                         if (
                           new Date(task.deadline).toLocaleDateString() ===
                           item.fullDate.toLocaleDateString().split("T")[0]
                         ) {
-                          return <TaskCards task={task} />;
+                          return (
+                            <TaskCards task={task} members={membersData} />
+                          );
                         }
                       })}
                     </div>
