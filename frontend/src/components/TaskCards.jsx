@@ -31,7 +31,11 @@ const TaskCards = (props) => {
   return (
     <>
       <div
-        className={styles.taskCard}
+        className={
+          props.task.status === "IN PROGRESS"
+            ? styles.taskCard
+            : styles.taskCardCompleted
+        }
         onClick={handleOpenModal}
         // type="button"
         // data-bs-toggle="modal"
@@ -45,7 +49,12 @@ const TaskCards = (props) => {
       </div>
 
       {isSuccess && openTaskModal && (
-        <DelTaskModal data={data} handleOpenModal={handleOpenModal} />
+        <DelTaskModal
+          data={data}
+          task={props.task}
+          handleOpenModal={handleOpenModal}
+          members={props.members}
+        />
       )}
     </>
   );
