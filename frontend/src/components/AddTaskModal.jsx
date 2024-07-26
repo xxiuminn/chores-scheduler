@@ -17,11 +17,12 @@ const AddTaskModal = (props) => {
   const [createdBy, setCreatedBy] = useState("");
   const [schedule, setSchedule] = useState("");
   const fetchData = useFetch();
-  const [members, setMembers] = useState([]);
 
   const accessToken = useCtx.accessToken;
   const claims = jwtDecode(accessToken);
   // console.log(claims);
+
+  // console.log(props.members);
 
   useEffect(() => {
     if (props.modalDate) {
@@ -46,27 +47,6 @@ const AddTaskModal = (props) => {
       setRule(value);
     }
   };
-
-  const { data, isSuccess } = useQuery({
-    queryKey: ["members"],
-    queryFn: async () => {
-      return await fetchData(
-        "/usergroups/members",
-        "POST",
-        {
-          usergroup_id: claims.group_id,
-        },
-        accessToken
-      );
-    },
-  });
-
-  useEffect(() => {
-    if (data) {
-      setMembers(data);
-    }
-    // console.log(data);
-  }, [data]);
 
   const { mutate } = useMutation({
     mutationFn: async () =>
@@ -95,24 +75,20 @@ const AddTaskModal = (props) => {
     e.preventDefault();
     mutate();
     console.log("form submitted");
+    props.closeModal();
   };
 
   return (
     <>
-      <div
-        className="modal fade"
-        id="addtaskmodal"
-        tabindex="-1"
-        aria-labelledby="addtaskmodal"
-        aria-hidden="true"
-      >
+      <div className="modal fade show d-block" tabIndex="-1" aria-hidden="true">
         <div className="modal-dialog modal-dialog-centered">
           <div className="modal-content">
             <div className="d-flex flex-column justify-content-between align-items-center">
               <button
                 type="button"
                 className="btn-close align-self-end me-3 mt-3"
-                data-bs-dismiss="modal"
+                onClick={() => props.closeModal()}
+                // data-bs-dismiss="modal"
                 aria-label="Close"
               ></button>
               <h1 className="modal-title">Argh another chore</h1>
@@ -267,10 +243,9 @@ const AddTaskModal = (props) => {
                   <option value="" disabled selected>
                     Pick a member
                   </option>
-                  {isSuccess &&
-                    data.map((member) => {
-                      return <option value={member.uuid}>{member.name}</option>;
-                    })}
+                  {props.members.map((member) => {
+                    return <option value={member.uuid}>{member.name}</option>;
+                  })}
                 </select>
 
                 <button className="mt-4 mb-5 align-self-center" type="submit">
@@ -281,6 +256,10 @@ const AddTaskModal = (props) => {
           </div>
         </div>
       </div>
+      <div
+        className="modal-backdrop fade show"
+        style={{ background: "rgba(0,0,0,0.2" }}
+      ></div>
     </>
   );
 };
