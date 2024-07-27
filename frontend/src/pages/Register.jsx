@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import styles from "./Login.module.css";
 import { useMutation } from "@tanstack/react-query";
 import useFetch from "../hooks/useFetch";
+import { Link, useNavigate } from "react-router-dom";
 
 const Register = (props) => {
   const fetchData = useFetch();
@@ -10,6 +11,7 @@ const Register = (props) => {
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
   const [inputType, setInputType] = useState("password");
+  const navigate = useNavigate();
 
   const { mutate } = useMutation({
     mutationFn: async () =>
@@ -23,7 +25,9 @@ const Register = (props) => {
         },
         undefined
       ),
-    onSuccess: () => props.handleShowLogin(),
+    onSuccess: () => {
+      navigate("/login");
+    },
   });
 
   const handleShowPw = (type) => {
@@ -83,7 +87,9 @@ const Register = (props) => {
             <button onClick={mutate}>Join</button>
             <div>
               Have an account?{" "}
-              <span onClick={() => props.handleShowLogin()}>Sign in</span>
+              <span>
+                <Link to="/login">Sign in</Link>
+              </span>
             </div>
           </div>
         </div>

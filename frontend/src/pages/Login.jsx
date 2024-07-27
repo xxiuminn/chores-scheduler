@@ -4,6 +4,7 @@ import styles from "./Login.module.css";
 import useFetch from "../hooks/useFetch";
 import { useQuery } from "@tanstack/react-query";
 import { jwtDecode } from "jwt-decode";
+import { Link, useNavigate } from "react-router-dom";
 
 const Login = (props) => {
   const fetchData = useFetch();
@@ -11,6 +12,7 @@ const Login = (props) => {
   const [password, setPassword] = useState("");
   const [email, setEmail] = useState("");
   const [inputType, setInputType] = useState("password");
+  const navigate = useNavigate();
 
   const { data, refetch } = useQuery({
     queryKey: ["login"],
@@ -40,7 +42,7 @@ const Login = (props) => {
       console.log(decoded);
       console.log(data.access);
       console.log("login successful");
-      props.handleShowLogin();
+      navigate("/board");
     }
   }, [data]);
 
@@ -93,7 +95,9 @@ const Login = (props) => {
             <button onClick={refetch}>Sign In</button>
             <div>
               Don't have an account?{" "}
-              <span onClick={() => props.handleShowLogin()}>Join</span>
+              <span>
+                <Link to="/register">Join</Link>
+              </span>
             </div>
           </div>
         </div>
