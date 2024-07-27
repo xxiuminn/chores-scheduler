@@ -6,6 +6,8 @@ import { useQuery } from "@tanstack/react-query";
 import { jwtDecode } from "jwt-decode";
 import UserContext from "../context/user";
 import TaskCards from "./TaskCards";
+import { Link, useNavigate } from "react-router-dom";
+import NavBar from "./NavBar";
 
 const Calendar = (props) => {
   const useCtx = useContext(UserContext);
@@ -18,6 +20,7 @@ const Calendar = (props) => {
   const [show, setShow] = useState(false);
   const [tasks, setTasks] = useState([]);
   const [members, setMembers] = useState([]);
+  const navigate = useNavigate();
 
   const daysInWeek = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
@@ -161,47 +164,7 @@ const Calendar = (props) => {
       <div className={styles.board}>
         <div className={styles.topnav}>
           <div className={styles.topleftnav}>
-            <button
-              type="button"
-              data-bs-toggle="offcanvas"
-              data-bs-target="#offcanvas"
-              aria-controls="offcanvas"
-              className={styles.opennavbar}
-            >
-              <i className="bi bi-arrow-right"></i>
-            </button>
-
-            <div
-              className="offcanvas offcanvas-start"
-              tabindex="-1"
-              id="offcanvas"
-              aria-labelledby="offcanvas"
-            >
-              <div className="offcanvas-header">
-                <h5 className="offcanvas-title" id="offcanvas"></h5>
-                <button
-                  type="button"
-                  className="btn-close"
-                  data-bs-dismiss="offcanvas"
-                  aria-label="Close"
-                ></button>
-              </div>
-              <div className="offcanvas-body">
-                <ul className="options">
-                  <li>
-                    <a href="#">Your Family Board</a>
-                  </li>
-                  <li>
-                    <a href="#">Members</a>
-                  </li>
-                  <br />
-                  <li>
-                    <a href="#">Upgrade Plan</a>
-                  </li>
-                </ul>
-              </div>
-            </div>
-
+            <NavBar />
             <div>
               <h3>{thisMonth}</h3>
             </div>
@@ -218,18 +181,12 @@ const Calendar = (props) => {
               </button>
               <ul className="dropdown-menu">
                 <li>
-                  <a className="dropdown-item" href="#">
+                  <Link to="/userprofile" className="dropdown-item">
                     Edit profile info
-                  </a>
+                  </Link>
                 </li>
                 <li>
-                  <a
-                    className="dropdown-item"
-                    href="#"
-                    onClick={() => props.logout()}
-                  >
-                    Logout
-                  </a>
+                  <a className="dropdown-item">Logout</a>
                 </li>
               </ul>
             </div>
