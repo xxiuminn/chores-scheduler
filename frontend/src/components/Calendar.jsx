@@ -9,9 +9,11 @@ import TaskCards from "./TaskCards";
 import { Link, useNavigate } from "react-router-dom";
 import NavBar from "./NavBar";
 
-const Calendar = (props) => {
+const Calendar = () => {
   const useCtx = useContext(UserContext);
   const fetchData = useFetch();
+  console.log(useCtx.accessToken);
+  console.log(jwtDecode(useCtx.accessToken));
   const claims = jwtDecode(useCtx.accessToken);
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [year, setYear] = useState(selectedDate.getFullYear());
@@ -19,7 +21,6 @@ const Calendar = (props) => {
   const [modalDate, setModalDate] = useState("");
   const [show, setShow] = useState(false);
   const [tasks, setTasks] = useState([]);
-  const [members, setMembers] = useState([]);
   const navigate = useNavigate();
 
   const daysInWeek = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
@@ -140,13 +141,13 @@ const Calendar = (props) => {
 
   // fetch members of user group
   const { data: membersData } = useQuery({
-    queryKey: ["members"],
+    queryKey: ["activemembers"],
     queryFn: async () => {
-      "start fetch members";
+      console.log("start fetch members");
       return await fetchData(
-        "/usergroups/members/" + claims.group_id,
-        undefined,
-        undefined,
+        "/usergroups/members/",
+        "POST",
+        { usergroup_id: claims.group_id, membership: "ACTIVE" },
         useCtx.accessToken
       );
     },
@@ -155,9 +156,20 @@ const Calendar = (props) => {
   useEffect(() => {
     if (membersData) {
       console.log(membersData);
-      setMembers(membersData);
+      // props.handleMembersData(membersData);
     }
   }, [membersData]);
+
+  const logout = () => {
+    // useCtx.setAccessToken("");
+    console.log("clearing token from local storage");
+    localStorage.clear();
+    console.log("clearing token from context");
+    useCtx.setAccessToken("");
+    console.log("navigating to login page");
+    navigate("/login");
+    console.log("logged out");
+  };
 
   return (
     <>
@@ -186,7 +198,9 @@ const Calendar = (props) => {
                   </Link>
                 </li>
                 <li>
-                  <a className="dropdown-item">Logout</a>
+                  <div className="dropdown-item" onClick={logout}>
+                    Logout
+                  </div>
                 </li>
               </ul>
             </div>
