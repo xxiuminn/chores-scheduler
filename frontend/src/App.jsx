@@ -5,23 +5,14 @@ import Cookies from "js-cookie";
 import UserContext from "./context/user";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
-import Calendar from "./components/Calendar";
 import UserProfile from "./pages/UserProfile";
+import Board from "./pages/Board";
+import Members from "./pages/Members";
 
 const queryClient = new QueryClient();
 
 function App() {
-  const [showLogin, setShowLogin] = useState(true);
-  const [accessToken, setAccessToken] = useState("");
-
-  const handleShowLogin = () => {
-    setAccessToken(Cookies.get("token"));
-    setShowLogin(!showLogin);
-  };
-
-  useEffect(() => {
-    setAccessToken(Cookies.get("token"));
-  }, []);
+  const [accessToken, setAccessToken] = useState(Cookies.get("token"));
 
   const logout = () => {
     Cookies.remove("token");
@@ -32,16 +23,14 @@ function App() {
     <>
       <QueryClientProvider client={queryClient}>
         <UserContext.Provider value={{ accessToken, setAccessToken }}>
-          {accessToken && <Calendar logout={logout} />}
-          {!accessToken && (
-            <>
-              {showLogin && <Login handleShowLogin={handleShowLogin} />}
-              {!showLogin && <Register handleShowLogin={handleShowLogin} />}
-            </>
-          )}
-          {/* <Routes>
-            <Route path="userprofile" element={<UserProfile />} />
-          </Routes> */}
+          <Routes>
+            <Route path="/" element={<Navigate replace to="/login" />} />
+            <Route path="/board" element={<Board />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+            <Route path="/userprofile" element={<UserProfile />} />
+            <Route path="/members" element={<Members />} />
+          </Routes>
         </UserContext.Provider>
       </QueryClientProvider>
     </>
