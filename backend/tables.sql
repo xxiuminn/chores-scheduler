@@ -6,7 +6,9 @@ CREATE TABLE users (
 	image_url		TEXT,
 	created_at		TIMESTAMP DEFAULT CURRENT_TIMESTAMP,			
 	group_id		SMALLINT,
+	membership VARCHAR(50)
 	CONSTRAINT fk_users FOREIGN KEY(group_id) REFERENCES user_groups(id)
+	CONSTRAINT fk_membershiptype FOREIGN KEY(membership) REFERENCES membership(types)
 );
 
 CREATE TABLE accounts (
@@ -60,3 +62,7 @@ CREATE TABLE status (
 
 INSERT INTO status(types)
 VALUES ('COMPLETED'), ('IN PROGRESS')
+
+CREATE TABLE membership(
+	types VARCHAR(50) UNIQUE PRIMARY KEY
+)

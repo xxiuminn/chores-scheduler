@@ -21,11 +21,6 @@ router.post(
   checkErrors,
   updateAccountType
 );
-router.get(
-  "/members/:usergroup_id",
-  validateGetGroupMembers,
-  checkErrors,
-  getGroupMembers
-);
+router.post("/members", validateGetGroupMembers, checkErrors, getGroupMembers);
 
 module.exports = router;

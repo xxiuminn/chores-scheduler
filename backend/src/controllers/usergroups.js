@@ -39,10 +39,10 @@ const createUserGroup = async (req, res) => {
 
     console.log(userGroupId);
 
-    await client.query("UPDATE users SET group_id=$1 WHERE uuid=$2", [
-      userGroupId,
-      req.body.uuid,
-    ]);
+    await client.query(
+      "UPDATE users SET group_id=$1, membership='ACTIVE', WHERE uuid=$2",
+      [userGroupId, req.body.uuid]
+    );
     await client.query("COMMIT");
     res.json({ status: "ok", msg: "user group created" });
   } catch (error) {
@@ -86,9 +86,15 @@ const updateAccountType = async (req, res) => {
 
 const getGroupMembers = async (req, res) => {
   try {
-    const members = await db.query("SELECT * FROM users WHERE group_id = $1", [
-      req.params.usergroup_id,
-    ]);
+    const { usergroup_id, membership } = req.body;
+    const members = await db.query(
+      "SELECT * FROM users WHERE (group_id = $1 AND membership = $2)",
+      [usergroup_id, membership]
+    );
+
+    if (!members.rows.length) {
+      res.status(400).json({ status: "error", msg: "not found" });
+    }
     res.json(members.rows);
   } catch (error) {
     console.error(error.message);

@@ -12,7 +12,8 @@ const validateUpdateAccountType = [
 ];
 
 const validateGetGroupMembers = [
-  param("usergroup_id", "user group id required").notEmpty().isInt(),
+  body("usergroup_id", "user group id required").notEmpty().isInt(),
+  body("membership", "membership is required").notEmpty().isString(),
 ];
 module.exports = {
   validateCreateUserGroup,

@@ -59,10 +59,31 @@ const getUserInfo = async (req, res) => {
   }
 };
 
+const getUserByEmail = async (req, res) => {
+  try {
+    const user = await db.query("SELECT uuid FROM users WHERE email=$1", [
+      req.params.email,
+    ]);
+    if (!user.rows.length) {
+      return res
+        .status(400)
+        .json({ status: "error", msg: "user not signed up yet" });
+    }
+
+    res.json(user.rows[0].uuid);
+  } catch (error) {
+    console.error(error.message);
+    res
+      .status(400)
+      .json({ status: "error", msg: "error getting user info by email " });
+  }
+};
+
 // join user group, quit user group or update any user info
 const updateUserInfo = async (req, res) => {
   try {
-    const { name, email, hash, image_url, group_id, uuid } = req.body;
+    const { name, email, hash, image_url, group_id, uuid, membership } =
+      req.body;
     const user = await db.query("SELECT * FROM users WHERE uuid=$1", [uuid]);
     if (!user.rows.length) {
       return res.status(400).json({ status: "error", msg: "user not found" });
@@ -77,16 +98,18 @@ const updateUserInfo = async (req, res) => {
       hash: hash === undefined ? userInfo.hash : hash,
       image_url: image_url === undefined ? userInfo.image_url : image_url,
       group_id: group_id === undefined ? userInfo.group_id : group_id,
+      membership: membership === undefined ? userInfo.membership : membership,
     };
 
     await db.query(
-      "UPDATE users SET name=$1, email=$2, hash=$3, image_url=$4, group_id=$5 WHERE uuid=$6",
+      "UPDATE users SET name=$1, email=$2, hash=$3, image_url=$4, group_id=$5, membership = $6 WHERE uuid=$7",
       [
         updated.name,
         updated.email,
         updated.hash,
         updated.image_url,
         updated.group_id,
+        updated.membership,
         uuid,
       ]
     );
@@ -97,4 +120,10 @@ const updateUserInfo = async (req, res) => {
   }
 };
 
-module.exports = { getUsers, seedUsers, getUserInfo, updateUserInfo };
+module.exports = {
+  getUsers,
+  seedUsers,
+  getUserInfo,
+  updateUserInfo,
+  getUserByEmail,
+};

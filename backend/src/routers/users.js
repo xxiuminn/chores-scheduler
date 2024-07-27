@@ -4,6 +4,7 @@ const {
   getUsers,
   seedUsers,
   getUserInfo,
+  getUserByEmail,
 } = require("../controllers/users");
 const router = express.Router();
 const {
@@ -16,5 +17,6 @@ router.get("/users", getUsers);
 router.post("/seed", seedUsers);
 router.patch("/update", validateUpdateUserInfo, checkErrors, updateUserInfo);
 router.get("/:uuid", validateGetUserInfo, checkErrors, getUserInfo);
+router.get("/invite/:email", getUserByEmail);
 
 module.exports = router;
