@@ -15,6 +15,6 @@ const checkErrors = require("../validators/checkErrors");
 router.get("/users", getUsers);
 router.post("/seed", seedUsers);
 router.patch("/update", validateUpdateUserInfo, checkErrors, updateUserInfo);
-router.post("/user", validateGetUserInfo, checkErrors, getUserInfo);
+router.get("/:uuid", validateGetUserInfo, checkErrors, getUserInfo);
 
 module.exports = router;

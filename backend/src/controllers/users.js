@@ -44,7 +44,7 @@ const getUserInfo = async (req, res) => {
   try {
     const user = await db.query(
       "SELECT users.uuid, users.name, users.email, users.image_url, users.group_id, user_groups.name AS group_name, user_groups.account_type FROM users INNER JOIN user_groups ON users.group_id = user_groups.id WHERE uuid = $1",
-      [req.body.uuid]
+      [req.params.uuid]
     );
 
     if (!user.rows.length) {

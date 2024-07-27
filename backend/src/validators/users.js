@@ -1,7 +1,7 @@
-const { body } = require("express-validator");
+const { body, param } = require("express-validator");
 
 const validateGetUserInfo = [
-  body("uuid", "user id is required").notEmpty().isString(),
+  param("uuid", "user id is required").notEmpty().isString(),
 ];
 
 const validateUpdateUserInfo = [
