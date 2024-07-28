@@ -10,9 +10,9 @@ const auth = (req, res, next) => {
   if (token) {
     try {
       const decoded = jwt.verify(token, process.env.ACCESS_SECRET);
-      console.log(decoded);
+      // console.log(decoded);
       req.decoded = decoded;
-      console.log(req);
+      // console.log(req);
       next();
     } catch (error) {
       console.error(error.message);
@@ -23,7 +23,7 @@ const auth = (req, res, next) => {
   }
 };
 
-const authFree = (req, res, next) => {
+const authFree = async (req, res, next) => {
   if (!("authorization" in req.headers)) {
     return res.status(400).json({ status: "error", msg: "token required" });
   }
@@ -32,12 +32,15 @@ const authFree = (req, res, next) => {
   if (token) {
     try {
       const decoded = jwt.verify(token, process.env.ACCESS_SECRET);
-      console.log(decoded);
-      if (decoded.group_id && decoded.membership === "ACTIVE") {
-        console.log("yes");
+      // get user data
+      const user = await db.query(
+        "SELECT group_id, membership FROM users WHERE uuid=$1",
+        [decoded.uuid]
+      );
+      console.log(user.rows[0].group_id);
+      console.log(user.rows[0].membership);
+      if (user.rows[0].group_id && user.rows[0].membership === "ACTIVE") {
         req.decoded = decoded;
-        console.log(decoded.group_id, decoded.membership);
-        console.log(token);
         next();
       } else {
         throw new Error();
@@ -60,15 +63,18 @@ const authPaid = async (req, res, next) => {
   if (token) {
     try {
       const decoded = jwt.verify(token, process.env.ACCESS_SECRET);
-      const accountTypeArr = await db.query(
-        "SELECT account_type FROM user_groups WHERE id=$1",
-        [decoded.group_id]
+      // get user data
+      const user = await db.query(
+        "SELECT users.group_id, users.membership, user_groups.account_type FROM users INNER JOIN user_groups ON users.group_id = user_groups.id WHERE uuid = $1",
+        [decoded.uuid]
       );
-      const accountType = accountTypeArr.rows[0].account_type;
+      console.log(user.rows[0].group_id);
+      console.log(user.rows[0].membership);
+      console.log(user.rows[0].account_type);
       if (
-        decoded.group_id &&
-        decoded.membership === "ACTIVE" &&
-        accountType === "PAID"
+        user.rows[0].group_id &&
+        user.rows[0].membership === "ACTIVE" &&
+        user.rows[0].account_type === "PAID"
       ) {
         req.decoded = decoded;
         next();
