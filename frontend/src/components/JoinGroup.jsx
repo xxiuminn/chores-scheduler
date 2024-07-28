@@ -1,8 +1,9 @@
 import React, { useState } from "react";
 import useFetch from "../hooks/useFetch";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { jwtDecode } from "jwt-decode";
 import { useNavigate } from "react-router-dom";
+import TopNav from "./TopNav";
 
 const JoinGroup = () => {
   const queryClient = useQueryClient();
@@ -13,6 +14,21 @@ const JoinGroup = () => {
   console.log(claims);
   const [groupName, setGroupName] = useState("");
   const navigate = useNavigate();
+
+  // fetch user info
+
+  const { data: userData, isSuccess } = useQuery({
+    queryKey: ["user"],
+    queryFn: async () => {
+      console.log("get user data please");
+      return await fetchData(
+        "/users/user/" + claims.uuid,
+        undefined,
+        undefined,
+        accessToken
+      );
+    },
+  });
 
   //create group
   const { mutate: createGroup } = useMutation({
@@ -30,6 +46,7 @@ const JoinGroup = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries(["usergroup"]);
+      console.log("successful in creating group");
       navigate("/board");
     },
   });
@@ -42,7 +59,7 @@ const JoinGroup = () => {
         "/users/update",
         "PATCH",
         {
-          group_id: claims.group_id,
+          group_id: userData.group_id,
           uuid: claims.uuid,
           membership: "ACTIVE",
         },
@@ -51,30 +68,50 @@ const JoinGroup = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries(["user"]);
+      console.log("successful in joining group invitation");
       navigate("/board");
     },
   });
 
   return (
-    <div>
-      <div>
-        <div>
-          You currently don't have a group yet. Would you like to create a group
-          to gain access to the free account features?
-        </div>
-        <label htmlFor="groupname">Group Name</label>
-        <input
-          type="text"
-          id="groupname"
-          onChange={(e) => setGroupName(e.target.value)}
-          value={groupName}
-        ></input>
-        <button onClick={createGroup}>Create</button>
-        <div></div>
-        {claims.membership === "INVITED" && <div>Invitation to join group</div>}
+    <>
+      <TopNav />
+      <div className="d-flex flex-column justify-content-center align-items-start m-3">
+        <form className="d-flex flex-column justify-content-center align-items-start needs-validation m-2">
+          <div>
+            You currently don't have a group yet. Create a group to gain access
+            to the free account features.
+          </div>
+          <div className="mt-3">
+            <label htmlFor="groupname" className="form-label">
+              Group Name
+            </label>
+            <input
+              type="text"
+              className="form-control"
+              id="groupname"
+              required
+              onChange={(e) => setGroupName(e.target.value)}
+              value={groupName}
+            ></input>
+            <button type="button" className="mt-3" onClick={createGroup}>
+              Create
+            </button>
+          </div>
+        </form>
+
+        {isSuccess && userData.membership === "INVITED" && (
+          <form className="d-flex flex-column justify-content-center align-items-start needs-validation m-2">
+            <label htmlFor="invite" className="form-label">
+              You are invited to join a group.
+            </label>
+            <button type="button" className="mt-3" onClick={updateUser}>
+              Join now
+            </button>
+          </form>
+        )}
       </div>
-      <button onClick={updateUser}>Join</button>
-    </div>
+    </>
   );
 };
 
