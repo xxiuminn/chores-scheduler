@@ -43,10 +43,11 @@ const login = async (req, res) => {
     const claims = {
       name: rows[0].name,
       email: rows[0].email,
-      image_url: rows[0].image_url,
-      created_at: rows[0].created_at,
-      group_id: rows[0].group_id,
+      // image_url: rows[0].image_url,
+      // created_at: rows[0].created_at,
+      // group_id: rows[0].group_id,
       uuid: rows[0].uuid,
+      // membership: rows[0].membership,
     };
 
     const access = jwt.sign(claims, process.env.ACCESS_SECRET, {
