@@ -45,9 +45,9 @@ const NavBar = () => {
             </li>
             <br />
             <li>
-              <a href="#">
+              <Link to="/subscribe">
                 <i class="bi bi-hand-thumbs-up m-3"></i>Upgrade Plan
-              </a>
+              </Link>
             </li>
           </ul>
         </div>

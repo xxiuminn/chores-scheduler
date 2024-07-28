@@ -8,6 +8,7 @@ import UserProfile from "./pages/UserProfile";
 import Members from "./pages/Members";
 import Calendar from "./components/Calendar";
 import JoinGroup from "./components/JoinGroup";
+import Subscription from "./pages/Subscription";
 
 const queryClient = new QueryClient();
 
@@ -31,6 +32,7 @@ function App() {
           <Route path="/userprofile" element={<UserProfile />} />
           <Route path="/members" element={<Members />} />
           <Route path="/joingroup" element={<JoinGroup />} />
+          <Route path="/subscribe" element={<Subscription />} />
         </Routes>
         {/* </UserContext.Provider> */}
       </QueryClientProvider>
