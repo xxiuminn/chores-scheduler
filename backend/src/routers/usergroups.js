@@ -12,15 +12,29 @@ const {
   validateGetGroupMembers,
 } = require("../validators/usergroups");
 const checkErrors = require("../validators/checkErrors");
+const { auth, authFree } = require("../middleware/auth");
 
 router.post("/seed/accounts", seedAccountTypes);
-router.put("/usergroup", validateCreateUserGroup, checkErrors, createUserGroup);
+router.put(
+  "/usergroup",
+  auth,
+  validateCreateUserGroup,
+  checkErrors,
+  createUserGroup
+);
 router.post(
   "/accounttype",
+  authFree,
   validateUpdateAccountType,
   checkErrors,
   updateAccountType
 );
-router.post("/members", validateGetGroupMembers, checkErrors, getGroupMembers);
+router.post(
+  "/members",
+  authFree,
+  validateGetGroupMembers,
+  checkErrors,
+  getGroupMembers
+);
 
 module.exports = router;
