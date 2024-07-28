@@ -14,7 +14,7 @@ const Login = (props) => {
   const [inputType, setInputType] = useState("password");
   const navigate = useNavigate();
   const [isLogin, setIsLogin] = useState(false);
-  // const useCtx = useContext(UserContext);
+  // const [userData, setUserData] = useState("");
 
   const { data } = useQuery({
     queryKey: ["login"],
@@ -36,12 +36,11 @@ const Login = (props) => {
   useEffect(() => {
     if (data && isLogin) {
       localStorage.setItem("token", data.access);
-      // useCtx.setAccessToken(data.access);
       const decoded = jwtDecode(data.access);
-      // console.log(decoded);
-      // console.log(data.access);
       console.log("login successful");
-      navigate("/board");
+      refetch();
+      // navigate("/board");
+      setIsLogin(false);
     }
   }, [data]);
 
@@ -49,6 +48,30 @@ const Login = (props) => {
     setViewPw(!viewPw);
     setInputType(type);
   };
+
+  // fetch user info
+
+  const { data: getUserData, refetch } = useQuery({
+    queryKey: ["user"],
+    queryFn: async () => {
+      console.log("get user data please");
+      return await fetchData(
+        "/users/user/" + jwtDecode(localStorage.getItem("token")).uuid,
+        undefined,
+        undefined,
+        localStorage.getItem("token")
+      );
+    },
+    enabled: false,
+  });
+
+  useEffect(() => {
+    if (getUserData) {
+      if (getUserData.membership === "ACTIVE") {
+        navigate("/board");
+      } else navigate("/joingroup");
+    }
+  }, [getUserData]);
 
   return (
     <>
