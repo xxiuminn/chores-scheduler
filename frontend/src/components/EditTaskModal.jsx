@@ -6,7 +6,8 @@ import { jwtDecode } from "jwt-decode";
 
 const EditTaskModal = (props) => {
   const fetchData = useFetch();
-  const useCtx = useContext(UserContext);
+  const accessToken = localStorage.getItem("token");
+  // const useCtx = useContext(UserContext);
   const queryClient = useQueryClient();
   const [title, setTitle] = useState(props.data.title);
   const [status, setStatus] = useState(props.data.status);
@@ -34,9 +35,9 @@ const EditTaskModal = (props) => {
           assigned_user: assignedUser,
           status,
           task_id: props.data.id,
-          last_modified_by: jwtDecode(useCtx.accessToken).uuid,
+          last_modified_by: jwtDecode(accessToken).uuid,
         },
-        useCtx.accessToken
+        accessToken
       );
     },
     onSuccess: () => {

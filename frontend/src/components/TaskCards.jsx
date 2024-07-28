@@ -7,7 +7,8 @@ import UserContext from "../context/user";
 
 const TaskCards = (props) => {
   const [openTaskModal, setOpenTaskModal] = useState(false);
-  const useCtx = useContext(UserContext);
+  // const useCtx = useContext(UserContext);
+  const accessToken = localStorage.getItem("token");
   const fetchData = useFetch();
 
   const { data, isSuccess, isFetching } = useQuery({
@@ -18,7 +19,7 @@ const TaskCards = (props) => {
         "/tasks/" + props.task.id,
         undefined,
         undefined,
-        useCtx.accessToken
+        accessToken
       );
     },
     enabled: openTaskModal,

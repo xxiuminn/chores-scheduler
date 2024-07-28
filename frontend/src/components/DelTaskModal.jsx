@@ -6,11 +6,12 @@ import EditTaskModal from "./EditTaskModal";
 
 const DelTaskModal = (props) => {
   const fetchData = useFetch();
-  const useCtx = useContext(UserContext);
+  // const useCtx = useContext(UserContext);
   const [openDelAlert, setOpenDelAlert] = useState(false);
   const [openEditForm, setOpenEditForm] = useState(false);
   const [deleteType, setDeleteType] = useState("");
   const queryClient = useQueryClient();
+  const accessToken = localStorage.getItem("token");
 
   const { mutate: delTask } = useMutation({
     mutationFn: async () => {
@@ -20,7 +21,7 @@ const DelTaskModal = (props) => {
         {
           task_id: props.data.id,
         },
-        useCtx.accessToken
+        accessToken
       );
     },
     onSuccess: () => {

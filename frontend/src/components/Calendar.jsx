@@ -4,17 +4,17 @@ import AddTaskModal from "./AddTaskModal";
 import useFetch from "../hooks/useFetch";
 import { useQuery } from "@tanstack/react-query";
 import { jwtDecode } from "jwt-decode";
-import UserContext from "../context/user";
 import TaskCards from "./TaskCards";
 import { Link, useNavigate } from "react-router-dom";
 import NavBar from "./NavBar";
 
 const Calendar = () => {
-  const useCtx = useContext(UserContext);
   const fetchData = useFetch();
-  console.log(useCtx.accessToken);
-  console.log(jwtDecode(useCtx.accessToken));
-  const claims = jwtDecode(useCtx.accessToken);
+  const accessToken = localStorage.getItem("token");
+  console.log(accessToken);
+  const claims = jwtDecode(accessToken);
+  console.log(claims);
+  const [userData, setUserData] = useState("");
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [year, setYear] = useState(selectedDate.getFullYear());
   const [monthIndex, setMonthIndex] = useState(selectedDate.getMonth());
@@ -23,6 +23,7 @@ const Calendar = () => {
   const [tasks, setTasks] = useState([]);
   const navigate = useNavigate();
 
+  //creating the weekly view calendar
   const daysInWeek = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
   const yearStart = () => {
@@ -44,14 +45,8 @@ const Calendar = () => {
   const getMonthArr = () => {
     let monthArr = [];
     const firstDateOfMonth = new Date(year, monthIndex, 1);
-    // const firstWeekOfMonth = Math.ceil(
-    //   (new Date(year, monthIndex, 1) - yearStart() + 1) / 86400000 / 7
-    // );
     const lastDateOfMonth = new Date(year, monthIndex + 1, 0);
     const daysInMonth = lastDateOfMonth.getDate();
-    // const lastWeekOfMonth = Math.ceil(
-    //   (new Date(year, monthIndex, daysInMonth) - yearStart() + 1) / 86400000 / 7
-    // );
     let dayOfFirstDateOfMonth = firstDateOfMonth.getDay();
     let dayOfLastDateOfMonth = lastDateOfMonth.getDay();
 
@@ -112,19 +107,43 @@ const Calendar = () => {
     setShow(true);
   };
 
+  // fetch user info
+
+  const { data: getUserData } = useQuery({
+    queryKey: ["user"],
+    queryFn: async () => {
+      console.log("get user data please");
+      return await fetchData(
+        "/users/" + claims.uuid,
+        undefined,
+        undefined,
+        accessToken
+      );
+    },
+  });
+
+  useEffect(() => {
+    if (getUserData) {
+      console.log(getUserData);
+      setUserData(getUserData);
+    }
+  }, [getUserData]);
+
   // fetch tasks by user groups
 
   const { data } = useQuery({
     queryKey: ["tasks"],
     queryFn: async () => {
       console.log("start fetch tasks");
+      console.log(userData);
       return await fetchData(
         "/tasks/usergroup",
         "POST",
         {
-          usergroup_id: claims.group_id,
+          // usergroup_id: claims.group_id,
+          usergroup_id: userData.group_id,
         },
-        useCtx.accessToken
+        accessToken
       );
     },
   });
@@ -147,8 +166,12 @@ const Calendar = () => {
       return await fetchData(
         "/usergroups/members/",
         "POST",
-        { usergroup_id: claims.group_id, membership: "ACTIVE" },
-        useCtx.accessToken
+        {
+          // usergroup_id: claims.group_id,
+          usergroup_id: userData.group_id,
+          membership: "ACTIVE",
+        },
+        accessToken
       );
     },
   });
@@ -163,9 +186,9 @@ const Calendar = () => {
   const logout = () => {
     // useCtx.setAccessToken("");
     console.log("clearing token from local storage");
-    localStorage.clear();
-    console.log("clearing token from context");
-    useCtx.setAccessToken("");
+    localStorage.removeItem("token");
+    // console.log("clearing token from context");
+    // useCtx.setAccessToken("");
     console.log("navigating to login page");
     navigate("/login");
     console.log("logged out");
@@ -249,6 +272,7 @@ const Calendar = () => {
                           modalDate={modalDate}
                           closeModal={closeModal}
                           members={membersData}
+                          userData={userData}
                         />
                       )}
                       {tasks.map((task) => {

@@ -13,9 +13,10 @@ const Login = (props) => {
   const [email, setEmail] = useState("");
   const [inputType, setInputType] = useState("password");
   const navigate = useNavigate();
-  const useCtx = useContext(UserContext);
+  const [isLogin, setIsLogin] = useState(false);
+  // const useCtx = useContext(UserContext);
 
-  const { data, refetch } = useQuery({
+  const { data } = useQuery({
     queryKey: ["login"],
     queryFn: async () => {
       try {
@@ -29,13 +30,13 @@ const Login = (props) => {
         throw error.message;
       }
     },
-    enabled: false,
+    enabled: isLogin,
   });
 
   useEffect(() => {
-    if (data) {
+    if (data && isLogin) {
       localStorage.setItem("token", data.access);
-      useCtx.setAccessToken(data.access);
+      // useCtx.setAccessToken(data.access);
       const decoded = jwtDecode(data.access);
       // console.log(decoded);
       // console.log(data.access);
@@ -90,7 +91,7 @@ const Login = (props) => {
                 ></i>
               )}
             </div>
-            <button onClick={refetch}>Sign In</button>
+            <button onClick={() => setIsLogin(!isLogin)}>Sign In</button>
             <div>
               Don't have an account?{" "}
               <span>
