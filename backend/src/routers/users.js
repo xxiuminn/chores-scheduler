@@ -1,7 +1,7 @@
 const express = require("express");
 const {
   updateUserInfo,
-  getUsers,
+  getUser,
   seedUsers,
   getUserInfo,
   getUserByEmail,
@@ -15,7 +15,7 @@ const {
 const checkErrors = require("../validators/checkErrors");
 const { auth, authFree } = require("../middleware/auth");
 
-router.get("/users", getUsers); //might not need this
+router.get("/user/:uuid", auth, validateGetUserInfo, checkErrors, getUser);
 router.post("/seed", seedUsers);
 router.patch(
   "/update",

@@ -1,11 +1,13 @@
 const db = require("../db/db");
 const bcrypt = require("bcrypt");
 
-const getUsers = async (req, res) => {
+const getUser = async (req, res) => {
   try {
-    const users = await db.query("SELECT * FROM users");
+    const users = await db.query("SELECT * FROM users WHERE uuid=$1", [
+      req.params.uuid,
+    ]);
     console.log(users);
-    res.json(users.rows);
+    res.json(users.rows[0]);
   } catch (error) {
     console.error(error.message);
     res.status(400).json({ status: "error", msg: "error getting users" });
@@ -46,6 +48,8 @@ const getUserInfo = async (req, res) => {
       "SELECT users.uuid, users.name, users.email, users.image_url, users.group_id, users.membership, user_groups.name AS group_name, user_groups.account_type FROM users INNER JOIN user_groups ON users.group_id = user_groups.id WHERE uuid = $1",
       [req.params.uuid]
     );
+
+    console.log(user);
 
     if (!user.rows.length) {
       return res.status(400).json({ status: "error", msg: "user not found" });
@@ -121,7 +125,7 @@ const updateUserInfo = async (req, res) => {
 };
 
 module.exports = {
-  getUsers,
+  getUser,
   seedUsers,
   getUserInfo,
   updateUserInfo,
