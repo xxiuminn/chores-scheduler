@@ -7,6 +7,7 @@ import { jwtDecode } from "jwt-decode";
 import TaskCards from "./TaskCards";
 import { Link, useNavigate } from "react-router-dom";
 import NavBar from "./NavBar";
+import JoinGroup from "./JoinGroup";
 
 const Calendar = () => {
   const fetchData = useFetch();
@@ -196,103 +197,108 @@ const Calendar = () => {
 
   return (
     <>
-      <div className={styles.board}>
-        <div className={styles.topnav}>
-          <div className={styles.topleftnav}>
-            <NavBar />
-            <div>
-              <h3>{thisMonth}</h3>
-            </div>
-          </div>
-
-          <div className={styles.toprightnav}>
-            <div className="dropdown">
-              <button
-                className={`dropdown-toggle ${styles.profile}`}
-                type="button"
-                data-bs-toggle="dropdown"
-              >
-                <i className="bi bi-person"></i>
-              </button>
-              <ul className="dropdown-menu">
-                <li>
-                  <Link to="/userprofile" className="dropdown-item">
-                    Edit profile info
-                  </Link>
-                </li>
-                <li>
-                  <div className="dropdown-item" onClick={logout}>
-                    Logout
-                  </div>
-                </li>
-              </ul>
+      {userData.group_id && userData.membership === "ACTIVE" && (
+        <div className={styles.board}>
+          <div className={styles.topnav}>
+            <div className={styles.topleftnav}>
+              <NavBar />
+              <div>
+                <h3>{thisMonth}</h3>
+              </div>
             </div>
 
-            <button className={styles.prevnext} onClick={handlePrev}>
-              <i className="bi bi-chevron-left"></i>
-            </button>
-            <button className={styles.prevnext} onClick={handleNext}>
-              <i className="bi bi-chevron-right"></i>
-            </button>
-          </div>
-        </div>
-
-        <div className={styles.calendar}>
-          <div className={styles.day}>
-            {daysInWeek.map((date, index) =>
-              getMonthArr().map((item) => {
-                if (item.weekOfDate === week && item.day === index) {
-                  return (
-                    <div className={styles.day}>
-                      <div className={styles.date}>{date}</div>
-                      <div
-                        key={item.fullDate}
-                        className={
-                          item.fullDate.toDateString() ==
-                          selectedDate.toDateString()
-                            ? styles.selected
-                            : styles.date
-                        }
-                        onClick={() => setSelectedDate(item.fullDate)}
-                      >
-                        {item.date}
-                      </div>
-                      <button
-                        type="button"
-                        // data-bs-toggle="modal"
-                        // data-bs-target="#addtaskmodal"
-                        className={styles.addtask}
-                        onClick={() => handleModalDate(item.fullDate)}
-                        closeModal={closeModal}
-                      >
-                        <i className="bi bi-plus"></i> Add Task
-                      </button>
-                      {show && (
-                        <AddTaskModal
-                          modalDate={modalDate}
-                          closeModal={closeModal}
-                          members={membersData}
-                          userData={userData}
-                        />
-                      )}
-                      {tasks.map((task) => {
-                        if (
-                          new Date(task.deadline).toLocaleDateString() ===
-                          item.fullDate.toLocaleDateString().split("T")[0]
-                        ) {
-                          return (
-                            <TaskCards task={task} members={membersData} />
-                          );
-                        }
-                      })}
+            <div className={styles.toprightnav}>
+              <div className="dropdown">
+                <button
+                  className={`dropdown-toggle ${styles.profile}`}
+                  type="button"
+                  data-bs-toggle="dropdown"
+                >
+                  <i className="bi bi-person"></i>
+                </button>
+                <ul className="dropdown-menu">
+                  <li>
+                    <Link to="/userprofile" className="dropdown-item">
+                      Edit profile info
+                    </Link>
+                  </li>
+                  <li>
+                    <div className="dropdown-item" onClick={logout}>
+                      Logout
                     </div>
-                  );
-                }
-              })
-            )}
+                  </li>
+                </ul>
+              </div>
+
+              <button className={styles.prevnext} onClick={handlePrev}>
+                <i className="bi bi-chevron-left"></i>
+              </button>
+              <button className={styles.prevnext} onClick={handleNext}>
+                <i className="bi bi-chevron-right"></i>
+              </button>
+            </div>
+          </div>
+
+          <div className={styles.calendar}>
+            <div className={styles.day}>
+              {daysInWeek.map((date, index) =>
+                getMonthArr().map((item) => {
+                  if (item.weekOfDate === week && item.day === index) {
+                    return (
+                      <div className={styles.day}>
+                        <div className={styles.date}>{date}</div>
+                        <div
+                          key={item.fullDate}
+                          className={
+                            item.fullDate.toDateString() ==
+                            selectedDate.toDateString()
+                              ? styles.selected
+                              : styles.date
+                          }
+                          onClick={() => setSelectedDate(item.fullDate)}
+                        >
+                          {item.date}
+                        </div>
+                        <button
+                          type="button"
+                          // data-bs-toggle="modal"
+                          // data-bs-target="#addtaskmodal"
+                          className={styles.addtask}
+                          onClick={() => handleModalDate(item.fullDate)}
+                          closeModal={closeModal}
+                        >
+                          <i className="bi bi-plus"></i> Add Task
+                        </button>
+                        {show && (
+                          <AddTaskModal
+                            modalDate={modalDate}
+                            closeModal={closeModal}
+                            members={membersData}
+                            userData={userData}
+                          />
+                        )}
+                        {tasks.map((task) => {
+                          if (
+                            new Date(task.deadline).toLocaleDateString() ===
+                            item.fullDate.toLocaleDateString().split("T")[0]
+                          ) {
+                            return (
+                              <TaskCards task={task} members={membersData} />
+                            );
+                          }
+                        })}
+                      </div>
+                    );
+                  }
+                })
+              )}
+            </div>
           </div>
         </div>
-      </div>
+      )}
+
+      {/* {!userData.group_id ||
+        (userData.membership === "INVITED" && <JoinGroup />)} */}
     </>
   );
 };
