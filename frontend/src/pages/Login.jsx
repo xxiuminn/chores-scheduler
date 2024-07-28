@@ -40,7 +40,7 @@ const Login = (props) => {
       console.log("login successful");
       refetch();
       // navigate("/board");
-      setIsLogin(false);
+      // setIsLogin(false);
     }
   }, [data]);
 
@@ -66,10 +66,14 @@ const Login = (props) => {
   });
 
   useEffect(() => {
-    if (getUserData) {
+    if (getUserData && isLogin) {
       if (getUserData.membership === "ACTIVE") {
         navigate("/board");
-      } else navigate("/joingroup");
+        setIsLogin(false);
+      } else {
+        navigate("/joingroup");
+        setIsLogin(false);
+      }
     }
   }, [getUserData]);
 
