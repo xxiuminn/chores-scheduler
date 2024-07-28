@@ -7,7 +7,7 @@ import Register from "./pages/Register";
 import UserProfile from "./pages/UserProfile";
 import Members from "./pages/Members";
 import Calendar from "./components/Calendar";
-import JoinGroup from "./pages/JoinGroup";
+import JoinGroup from "./components/JoinGroup";
 
 const queryClient = new QueryClient();
 
