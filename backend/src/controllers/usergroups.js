@@ -40,13 +40,13 @@ const createUserGroup = async (req, res) => {
     console.log(userGroupId);
 
     await client.query(
-      "UPDATE users SET group_id=$1, membership='ACTIVE', WHERE uuid=$2",
+      "UPDATE users SET group_id=$1, membership='ACTIVE' WHERE uuid=$2",
       [userGroupId, req.body.uuid]
     );
     await client.query("COMMIT");
     res.json({ status: "ok", msg: "user group created" });
   } catch (error) {
-    await client.query("ROLLOVER");
+    await client.query("ROLLBACK");
     console.error(error.message);
     res.status(400).json({ status: "error", msg: "error creating user group" });
   } finally {
@@ -93,7 +93,7 @@ const getGroupMembers = async (req, res) => {
     );
 
     if (!members.rows.length) {
-      res.status(400).json({ status: "error", msg: "not found" });
+      return res.status(400).json({ status: "error", msg: "not found" });
     }
     res.json(members.rows);
   } catch (error) {
