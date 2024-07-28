@@ -23,28 +23,63 @@ const {
 } = require("../validators/tasks");
 
 const checkErrors = require("../validators/checkErrors");
+const { authFree, authPaid, auth } = require("../middleware/auth");
 
-router.put("/create", validateCreateTaskGroup, checkErrors, createTaskGroup);
+//need to add one more controller for the free version.
+router.put(
+  "/create",
+  authFree,
+  validateCreateTaskGroup,
+  checkErrors,
+  createTaskGroup
+);
 router.post(
   "/usergroup",
+  authFree,
   validateGetTaskByUserGroup,
   checkErrors,
   getTasksByUserGroup
 );
-router.post("/user", validateGetTaskByUser, checkErrors, getTasksByUser);
-router.get("/:task_id", validateGetTask, checkErrors, getTask);
-router.delete("/deleteone", validateDelTask, checkErrors, delTask);
-router.delete("/deleteall", validateDelTask, checkErrors, delAllTasks);
+router.post(
+  "/user",
+  authFree,
+  validateGetTaskByUser,
+  checkErrors,
+  getTasksByUser
+);
+router.get("/:task_id", authFree, validateGetTask, checkErrors, getTask);
+router.delete("/deleteone", authFree, validateDelTask, checkErrors, delTask);
+router.delete(
+  "/deleteall",
+  authPaid,
+  validateDelTask,
+  checkErrors,
+  delAllTasks
+);
 router.delete(
   "/deletefollowing",
+  authPaid,
   validateDelTask,
   checkErrors,
   delFollowingTasks
 );
-router.patch("/updateone", validateUpdateTask, checkErrors, updateTask);
-router.patch("/updateall", validateUpdateTask, checkErrors, updateAllTasks);
+router.patch(
+  "/updateone",
+  authFree,
+  validateUpdateTask,
+  checkErrors,
+  updateTask
+);
+router.patch(
+  "/updateall",
+  authPaid,
+  validateUpdateTask,
+  checkErrors,
+  updateAllTasks
+);
 router.patch(
   "/updatefollowing",
+  authPaid,
   validateUpdateTask,
   checkErrors,
   updateFollowingTasks
