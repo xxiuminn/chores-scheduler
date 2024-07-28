@@ -7,10 +7,34 @@ import { jwtDecode } from "jwt-decode";
 
 const Members = () => {
   const fetchData = useFetch();
-  const useCtx = useContext(UserContext);
-  const claims = jwtDecode(useCtx.accessToken);
+  // const useCtx = useContext(UserContext);
+  const accessToken = localStorage.getItem("token");
+  const [userData, setUserData] = useState("");
+  const claims = jwtDecode(accessToken);
   const queryClient = useQueryClient();
   const [emailInvited, setEmailInvited] = useState("");
+
+  // fetch user info
+
+  const { data: getUserData } = useQuery({
+    queryKey: ["user"],
+    queryFn: async () => {
+      console.log("get user data please");
+      return await fetchData(
+        "/users/" + claims.uuid,
+        undefined,
+        undefined,
+        accessToken
+      );
+    },
+  });
+
+  useEffect(() => {
+    if (getUserData) {
+      console.log(getUserData);
+      setUserData(getUserData);
+    }
+  }, [getUserData]);
 
   // fetch active members of user group
   const { data: membersData, isSuccess: membersSuccess } = useQuery({
@@ -21,10 +45,10 @@ const Members = () => {
         "/usergroups/members",
         "POST",
         {
-          usergroup_id: claims.group_id,
+          usergroup_id: userData.group_id,
           membership: "ACTIVE",
         },
-        useCtx.accessToken
+        accessToken
       );
     },
   });
@@ -41,7 +65,7 @@ const Members = () => {
           uuid: uuid,
           membership: null,
         },
-        useCtx.accessToken
+        accessToken
       );
     },
     onSuccess: () => {
@@ -58,7 +82,7 @@ const Members = () => {
         "/users/invite/" + emailInvited,
         undefined,
         undefined,
-        useCtx.accessToken
+        accessToken
       );
     },
     enabled: false,
@@ -77,11 +101,11 @@ const Members = () => {
         "/users/update",
         "PATCH",
         {
-          group_id: claims.group_id,
+          group_id: userData.group_id,
           uuid: data,
           membership: "INVITED",
         },
-        useCtx.accessToken
+        accessToken
       );
     },
     onSuccess: () => {
@@ -100,10 +124,10 @@ const Members = () => {
         "/usergroups/members",
         "POST",
         {
-          usergroup_id: claims.group_id,
+          usergroup_id: userData.group_id,
           membership: "INVITED",
         },
-        useCtx.accessToken
+        accessToken
       );
     },
   });

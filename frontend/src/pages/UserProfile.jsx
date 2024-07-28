@@ -7,22 +7,18 @@ import NavBar from "../components/NavBar";
 
 const UserProfile = () => {
   const fetchData = useFetch();
-  const useCtx = useContext(UserContext);
+  // const useCtx = useContext(UserContext);
+  const accessToken = localStorage.getItem("token");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const queryClient = useQueryClient();
-  const uuid = jwtDecode(useCtx.accessToken).uuid;
+  const uuid = jwtDecode(accessToken).uuid;
   const [changedAlert, setChangedAlert] = useState(false);
 
   const { data, isSuccess } = useQuery({
     queryKey: ["user"],
     queryFn: async () =>
-      await fetchData(
-        "/users/" + uuid,
-        undefined,
-        undefined,
-        useCtx.accessToken
-      ),
+      await fetchData("/users/" + uuid, undefined, undefined, accessToken),
   });
 
   const { mutate } = useMutation({
@@ -35,7 +31,7 @@ const UserProfile = () => {
           email,
           uuid,
         },
-        useCtx.accessToken
+        accessToken
       );
     },
     onSuccess: () => {

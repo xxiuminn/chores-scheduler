@@ -5,7 +5,7 @@ import UserContext from "../context/user";
 import { jwtDecode } from "jwt-decode";
 
 const AddTaskModal = (props) => {
-  const useCtx = useContext(UserContext);
+  // const useCtx = useContext(UserContext);
   const queryClient = useQueryClient();
   const [deadline, setDeadline] = useState("");
   const [title, setTitle] = useState("");
@@ -18,7 +18,7 @@ const AddTaskModal = (props) => {
   const [schedule, setSchedule] = useState("");
   const fetchData = useFetch();
 
-  const accessToken = useCtx.accessToken;
+  const accessToken = localStorage.getItem("token");
   const claims = jwtDecode(accessToken);
   // console.log(claims);
 
@@ -61,7 +61,8 @@ const AddTaskModal = (props) => {
           created_by: claims.uuid,
           is_rotate: isRotate,
           rule,
-          usergroup_id: claims.group_id,
+          // usergroup_id: claims.group_id,
+          usergroup_id: props.userData.group_id,
         },
         accessToken
       ),
