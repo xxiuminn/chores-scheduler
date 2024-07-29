@@ -38,7 +38,7 @@ const Subscription = () => {
     if (subscribeData && usergroupData) {
       console.log(subscribeData);
       window.location = subscribeData.url;
-      updateAcct();
+      // updateAcct();
     }
   }, [subscribeData]);
 

@@ -25,47 +25,40 @@ const subscribe = async (req, res) => {
 };
 
 //stripe webhooks
-// app.post("/webhook", async (req, res) => {
-//   let data;
-//   let eventType;
+const verifypayment = async (req, res) => {
+  let data;
+  let eventType;
 
-//   //to verify that the event comes from stripe.
-//   let event;
-//   const sig = req.headers["stripe-signature"];
+  const webhookSecret = process.env.STRIPE_ENDPOINT_SECRET;
+  if (webhookSecret) {
+    let event;
+    const sig = req.headers["stripe-signature"];
+    try {
+      event = stripe.webhooks.constructEvent(req.rawBody, sig, webhookSecret);
+    } catch (error) {
+      console.error(error.message);
+      return res.status(400).json({
+        status: "error",
+        message: "webhook signature verification failed",
+      });
+    }
 
-//   try {
-//     event = stripe.webhooks.constructEvent(
-//       req.body,
-//       sig,
-//       process.env.STRIPE_ENDPOINT_SECRET
-//     );
-//   } catch (error) {
-//     console.error(error.message);
-//     return res.status(400).json({
-//       status: "error",
-//       message: "webhook signature verification failed",
-//     });
-//   }
+    data = event.data;
+    // console.log(data);
+    eventType = event.type;
+    console.log(eventType);
+  } else {
+    data = req.body.data;
+    eventType = req.body.type;
+  }
 
-//   // Handle the event
-//   switch (event.type) {
-//     case "checkout.session.completed":
-//       console.log(event.data.object);
-//       // Then define and call a method to handle the successful payment intent.
-//       // handlePaymentIntentSucceeded(paymentIntent);
-//       break;
-//     case "invoice.paument_failed":
-//       const paymentMethod = event.data.object;
-//       // Then define and call a method to handle the successful attachment of a PaymentMethod.
-//       // handlePaymentMethodAttached(paymentMethod);
-//       break;
-//     // ... handle other event types
-//     default:
-//       console.log(`Unhandled event type ${event.type}`);
-//   }
+  if (eventType === "checkout.session.completed") {
+    console.log("payment received!");
+    console.log(data.object.status);
+    // res.json(data.object.status)
+    // res.json({received: true})
+    return res.json(data.object.status);
+  } else return res.json({ received: true });
+};
 
-//   // Return a response to acknowledge receipt of the event
-//   response.json({ received: true });
-// });
-
-module.exports = { subscribe };
+module.exports = { subscribe, verifypayment };
