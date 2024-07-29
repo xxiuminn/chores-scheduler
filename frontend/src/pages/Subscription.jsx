@@ -27,7 +27,7 @@ const Subscription = () => {
       return await fetchData(
         "/subscribe/create-checkout-session",
         "POST",
-        undefined,
+        { uuid: jwtDecode(accessToken).uuid },
         accessToken
       );
     },
@@ -38,26 +38,8 @@ const Subscription = () => {
     if (subscribeData && usergroupData) {
       console.log(subscribeData);
       window.location = subscribeData.url;
-      // updateAcct();
     }
   }, [subscribeData]);
-
-  const { mutate: updateAcct } = useMutation({
-    mutationFn: async () => {
-      await fetchData(
-        "/usergroups/accounttype",
-        "PATCH",
-        {
-          account_type: "PAID",
-          usergroup_id: usergroupData.group_id,
-        },
-        accessToken
-      );
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries(["usergroup"]);
-    },
-  });
 
   return <button onClick={subscribeRefetch}>Subscribe</button>;
 };

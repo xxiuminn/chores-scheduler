@@ -1,4 +1,5 @@
 const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
+const db = require("../db/db");
 
 //stripe payment
 const subscribe = async (req, res) => {
@@ -9,11 +10,26 @@ const subscribe = async (req, res) => {
       cancel_url: "http://localhost:5173/subscribe",
       line_items: [{ price: process.env.STRIPE_PRICE_ID, quantity: 1 }],
     });
-    console.log("session: ", session.id, session.url, session);
-    // get id, save to user, return url
+    // console.log("session: ", session.id, session.url, session);
+
     const sessionId = session.id;
-    console.log("sessionId: ", sessionId);
+    // console.log("sessionId: ", sessionId);
+
     //save session.id to the user in the database
+    //get group id using uuid
+    const usergroupArr = await db.query(
+      "SELECT group_id FROM users WHERE uuid=$1",
+      [req.body.uuid]
+    );
+    console.log(usergroupArr.rows[0].group_id);
+    const usergroup = usergroupArr.rows[0].group_id;
+    console.log(usergroup);
+    console.log(sessionId);
+    // update stripe_session_id
+    await db.query("UPDATE user_groups SET stripe_session_id=$1 WHERE id=$2", [
+      sessionId,
+      usergroup,
+    ]);
 
     res.json({ url: session.url });
   } catch (error) {
@@ -44,9 +60,9 @@ const verifypayment = async (req, res) => {
     }
 
     data = event.data;
-    // console.log(data);
+    console.log(data);
     eventType = event.type;
-    console.log(eventType);
+    // console.log(eventType);
   } else {
     data = req.body.data;
     eventType = req.body.type;
@@ -55,9 +71,15 @@ const verifypayment = async (req, res) => {
   if (eventType === "checkout.session.completed") {
     console.log("payment received!");
     console.log(data.object.status);
+    console.log(data.object.id);
+
+    await db.query(
+      "UPDATE user_groups SET account_type='PAID' WHERE stripe_session_id=$1",
+      [data.object.id]
+    );
     // res.json(data.object.status)
     // res.json({received: true})
-    return res.json(data.object.status);
+    return res.json({ status: "ok", message: "payment success" });
   } else return res.json({ received: true });
 };
 
