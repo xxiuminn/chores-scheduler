@@ -25,7 +25,7 @@ const {
 const checkErrors = require("../validators/checkErrors");
 const { authFree, authPaid, auth } = require("../middleware/auth");
 
-//need to add one more controller for the free version.
+// differentiation of authFree & authPaid access within controller.
 router.put(
   "/create",
   authFree,

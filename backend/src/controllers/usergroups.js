@@ -7,7 +7,7 @@ const seedAccountTypes = async (req, res) => {
       "INSERT INTO accounts(types) VALUES($1), ($2)",
       ["FREE", "PAID"]
     );
-    console.log(accountTypes);
+    // console.log(accountTypes);
     res.json({ status: "ok", msg: "account types seeded" });
   } catch (error) {
     console.error(error.message);
@@ -34,10 +34,10 @@ const createUserGroup = async (req, res) => {
       [req.body.usergroup_name, req.body.account_type]
     );
 
-    console.log(userGroup);
+    // console.log(userGroup);
     const userGroupId = userGroup.rows[0].id;
 
-    console.log(userGroupId);
+    // console.log(userGroupId);
 
     await client.query(
       "UPDATE users SET group_id=$1, membership='ACTIVE' WHERE uuid=$2",

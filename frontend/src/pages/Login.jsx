@@ -69,11 +69,10 @@ const Login = (props) => {
     if (getUserData && isLogin) {
       if (getUserData.membership === "ACTIVE") {
         navigate("/board");
-        setIsLogin(false);
       } else {
         navigate("/joingroup");
-        setIsLogin(false);
       }
+      setIsLogin(false);
     }
   }, [getUserData]);
 

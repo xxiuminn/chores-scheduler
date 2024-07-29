@@ -30,7 +30,7 @@ const login = async (req, res) => {
     const { rows } = await db.query("SELECT * FROM users WHERE email= $1", [
       req.body.email,
     ]);
-    console.log(rows);
+    // console.log(rows);
     if (!rows.length) {
       return res.status(401).json({ status: "error", msg: "not authorised" });
     }

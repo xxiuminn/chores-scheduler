@@ -37,8 +37,8 @@ const authFree = async (req, res, next) => {
         "SELECT group_id, membership FROM users WHERE uuid=$1",
         [decoded.uuid]
       );
-      console.log(user.rows[0].group_id);
-      console.log(user.rows[0].membership);
+      // console.log(user.rows[0].group_id);
+      // console.log(user.rows[0].membership);
       if (user.rows[0].group_id && user.rows[0].membership === "ACTIVE") {
         req.decoded = decoded;
         next();
@@ -68,9 +68,9 @@ const authPaid = async (req, res, next) => {
         "SELECT users.group_id, users.membership, user_groups.account_type FROM users INNER JOIN user_groups ON users.group_id = user_groups.id WHERE uuid = $1",
         [decoded.uuid]
       );
-      console.log(user.rows[0].group_id);
-      console.log(user.rows[0].membership);
-      console.log(user.rows[0].account_type);
+      // console.log(user.rows[0].group_id);
+      // console.log(user.rows[0].membership);
+      // console.log(user.rows[0].account_type);
       if (
         user.rows[0].group_id &&
         user.rows[0].membership === "ACTIVE" &&

@@ -5,7 +5,7 @@ const subscribe = async (req, res) => {
   try {
     const session = await stripe.checkout.sessions.create({
       mode: "subscription",
-      success_url: "http://localhost:5173/success",
+      success_url: "http://localhost:5173/subscribe",
       cancel_url: "http://localhost:5173/subscribe",
       line_items: [{ price: process.env.STRIPE_PRICE_ID, quantity: 1 }],
     });
@@ -24,14 +24,48 @@ const subscribe = async (req, res) => {
   }
 };
 
-//check paymentintent status
-// const session = async (req, res) => {
+//stripe webhooks
+// app.post("/webhook", async (req, res) => {
+//   let data;
+//   let eventType;
+
+//   //to verify that the event comes from stripe.
+//   let event;
+//   const sig = req.headers["stripe-signature"];
+
 //   try {
-//     const status = await stripe.checkout.sessions.retrieve();
+//     event = stripe.webhooks.constructEvent(
+//       req.body,
+//       sig,
+//       process.env.STRIPE_ENDPOINT_SECRET
+//     );
 //   } catch (error) {
 //     console.error(error.message);
-//     res.status(500).json({ status: "error", msg: "stripe error" });
+//     return res.status(400).json({
+//       status: "error",
+//       message: "webhook signature verification failed",
+//     });
 //   }
-// };
+
+//   // Handle the event
+//   switch (event.type) {
+//     case "checkout.session.completed":
+//       console.log(event.data.object);
+//       // Then define and call a method to handle the successful payment intent.
+//       // handlePaymentIntentSucceeded(paymentIntent);
+//       break;
+//     case "invoice.paument_failed":
+//       const paymentMethod = event.data.object;
+//       // Then define and call a method to handle the successful attachment of a PaymentMethod.
+//       // handlePaymentMethodAttached(paymentMethod);
+//       break;
+//     // ... handle other event types
+//     default:
+//       console.log(`Unhandled event type ${event.type}`);
+//   }
+
+//   // Return a response to acknowledge receipt of the event
+//   response.json({ received: true });
+// });
 
 module.exports = { subscribe };

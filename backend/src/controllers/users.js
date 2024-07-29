@@ -6,7 +6,7 @@ const getUser = async (req, res) => {
     const users = await db.query("SELECT * FROM users WHERE uuid=$1", [
       req.params.uuid,
     ]);
-    console.log(users);
+    // console.log(users);
     res.json(users.rows[0]);
   } catch (error) {
     console.error(error.message);
@@ -34,7 +34,7 @@ const seedUsers = async (req, res) => {
         hash3,
       ]
     );
-    console.log(users);
+    // console.log(users);
     res.json({ status: "ok", msg: "users seeded successfully" });
   } catch (error) {
     console.error(error.message);
@@ -49,13 +49,13 @@ const getUserInfo = async (req, res) => {
       [req.params.uuid]
     );
 
-    console.log(user);
+    // console.log(user);
 
     if (!user.rows.length) {
       return res.status(400).json({ status: "error", msg: "user not found" });
     }
 
-    console.log(user.rows);
+    // console.log(user.rows);
     res.json(user.rows[0]);
   } catch (error) {
     console.error(error.message);
@@ -92,9 +92,9 @@ const updateUserInfo = async (req, res) => {
     if (!user.rows.length) {
       return res.status(400).json({ status: "error", msg: "user not found" });
     }
-    console.log(user);
+    // console.log(user);
     const userInfo = user.rows[0];
-    console.log(userInfo);
+    // console.log(userInfo);
 
     const updated = {
       name: name === undefined ? userInfo.name : name,

@@ -14,16 +14,27 @@ const createTaskGroup = async (req, res) => {
   try {
     await client.query("BEGIN");
 
+    //for member rotation
     const members = await client.query(
       "SELECT uuid FROM users WHERE group_id = $1",
       [req.body.usergroup_id]
     );
-    console.log(members.rows);
+    // console.log(members.rows);
     const numMembers = members.rowCount;
     let memberIndex = members.rows.findIndex(
       (element) => element.uuid === req.body.assigned_user
     );
-    console.log(memberIndex);
+    // console.log(memberIndex);
+
+    //check if usergroup account is paid or free
+    const accountTypeArr = await client.query(
+      "SELECT account_type FROM user_groups WHERE id=$1",
+      [req.body.usergroup_id]
+    );
+
+    const accountType = accountTypeArr.rows[0].id;
+    // console.log(accountType);
+
     // if task group is set to non recurring:
     if (req.body.is_recurring === 0) {
       const taskGroup = await client.query(
@@ -34,7 +45,7 @@ const createTaskGroup = async (req, res) => {
       // const taskGroup = await db.query("SELECT * FROM task_groups");
       const { rows } = taskGroup;
       const taskGroupId = rows[0].id;
-      console.log(taskGroupId);
+      // console.log(taskGroupId);
 
       await client.query(
         "INSERT INTO tasks(title, deadline, assigned_user, created_by, group_id) VALUES($1,$2,$3,$4,$5)",
@@ -48,8 +59,8 @@ const createTaskGroup = async (req, res) => {
       );
     }
 
-    // if task group is set to recurring & no rotation
-    else if (req.body.is_recurring === 1) {
+    // if task group is set to recurring & no rotation + check if paid account
+    else if (req.body.is_recurring === 1 && accountType === "PAID") {
       //create task group
       const taskGroup = await client.query(
         "INSERT INTO task_groups(is_recurring, is_rotate, rule) VALUES($1,$2,$3) RETURNING id",
@@ -92,8 +103,8 @@ const createTaskGroup = async (req, res) => {
           if (memberIndex === numMembers) {
             memberIndex = 0;
           }
-          console.log(memberIndex);
-          console.log(members.rows[memberIndex].uuid);
+          // console.log(memberIndex);
+          // console.log(members.rows[memberIndex].uuid);
           await client.query(
             "INSERT INTO tasks(title, deadline, assigned_user, created_by, group_id) VALUES($1, $2, $3, $4, $5)",
             [
@@ -105,9 +116,14 @@ const createTaskGroup = async (req, res) => {
             ]
           );
           memberIndex += 1;
-        } else return;
+        } else
+          return res
+            .status(403)
+            .json({ status: "error", msg: "not authorised" });
       }
-    } else return;
+    } else {
+      return res.status(403).json({ status: "error", msg: "not authorised" });
+    }
     res.json({ status: "ok", msg: "task group created" });
     await client.query("COMMIT");
   } catch (error) {
@@ -179,7 +195,7 @@ const delTask = async (req, res) => {
     );
 
     const groupTaskId = taskGroup.rows[0].group_id;
-    console.log(groupTaskId);
+    // console.log(groupTaskId);
 
     const task = await client.query("SELECT * FROM tasks WHERE group_id=$1", [
       groupTaskId,
@@ -227,9 +243,9 @@ const delAllTasks = async (req, res) => {
         .json({ status: "error", msg: "task cannot be found" });
     }
 
-    console.log(task);
+    // console.log(task);
     const groupTaskId = task.rows[0].group_id;
-    console.log(groupTaskId);
+    // console.log(groupTaskId);
 
     await client.query("DELETE FROM tasks WHERE group_id = $1", [groupTaskId]);
 
@@ -301,7 +317,7 @@ const updateTask = async (req, res) => {
     }
 
     const taskInfo = task.rows[0];
-    console.log(taskInfo);
+    // console.log(taskInfo);
 
     const updated = {
       title: title === (undefined || taskInfo.title) ? taskInfo.title : title,
@@ -371,7 +387,7 @@ const updateAllTasks = async (req, res) => {
     // console.log(taskArr);
 
     const ogDeadline = task.rows[0].deadline;
-    console.log(ogDeadline);
+    // console.log(ogDeadline);
     const addNum = new Date(deadline) - ogDeadline;
     const addNumInDays = Math.floor(addNum / (1000 * 60 * 60 * 24));
 
