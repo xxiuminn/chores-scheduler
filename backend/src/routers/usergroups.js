@@ -22,7 +22,7 @@ router.put(
   checkErrors,
   createUserGroup
 );
-router.post(
+router.patch(
   "/accounttype",
   authFree,
   validateUpdateAccountType,
