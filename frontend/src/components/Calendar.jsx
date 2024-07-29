@@ -2,7 +2,7 @@ import React, { useEffect, useState, useContext } from "react";
 import styles from "./Calendar.module.css";
 import AddTaskModal from "./AddTaskModal";
 import useFetch from "../hooks/useFetch";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { jwtDecode } from "jwt-decode";
 import TaskCards from "./TaskCards";
 import { Link, useNavigate } from "react-router-dom";
@@ -11,6 +11,7 @@ import JoinGroup from "./JoinGroup";
 
 const Calendar = () => {
   const fetchData = useFetch();
+  const queryClient = useQueryClient();
   const accessToken = localStorage.getItem("token");
   console.log(accessToken);
   const claims = jwtDecode(accessToken);
@@ -188,8 +189,11 @@ const Calendar = () => {
     // useCtx.setAccessToken("");
     console.log("clearing token from local storage");
     localStorage.removeItem("token");
+    queryClient.removeQueries();
+
     // console.log("clearing token from context");
     // useCtx.setAccessToken("");
+
     console.log("navigating to login page");
     navigate("/login");
     console.log("logged out");
