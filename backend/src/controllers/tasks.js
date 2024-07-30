@@ -32,8 +32,9 @@ const createTaskGroup = async (req, res) => {
       [req.body.usergroup_id]
     );
 
-    const accountType = accountTypeArr.rows[0].id;
-    // console.log(accountType);
+    const accountType = accountTypeArr.rows[0].account_type;
+    console.log(accountType);
+    console.log(accountTypeArr);
 
     // if task group is set to non recurring:
     if (req.body.is_recurring === 0) {
