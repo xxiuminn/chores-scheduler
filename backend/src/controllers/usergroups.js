@@ -87,10 +87,9 @@ const updateAccountType = async (req, res) => {
 const getGroupMembers = async (req, res) => {
   try {
     const { usergroup_id, membership } = req.body;
-    const members = await db.query(
-      "SELECT * FROM users WHERE (group_id = $1 AND membership = $2)",
-      [usergroup_id, membership]
-    );
+    const members = await db.query("SELECT * FROM users WHERE group_id = $1", [
+      usergroup_id,
+    ]);
 
     if (!members.rows.length) {
       return res.status(400).json({ status: "error", msg: "not found" });
