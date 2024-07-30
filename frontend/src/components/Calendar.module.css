@@ -3,6 +3,7 @@
   grid-template-rows: 1fr 9fr;
   min-height: 100vh;
   width: 100vw;
+  overflow-x: hidden;
   padding: 1em 2em 1em 2em;
   /* background-color: rgb(255, 255, 255); */
   background-image: url("/assets/beige-bg.png");

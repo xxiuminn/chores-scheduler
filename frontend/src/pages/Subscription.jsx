@@ -4,12 +4,13 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { jwtDecode } from "jwt-decode";
 import TopNav from "../components/TopNav";
 import styles from "../components/Subscribe.module.css";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 const Subscription = () => {
   const fetchData = useFetch();
   const accessToken = localStorage.getItem("token");
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
 
   //retrieve user's group:
   const { data: usergroupData } = useQuery({
@@ -44,6 +45,10 @@ const Subscription = () => {
     }
   }, [subscribeData]);
 
+  const returnToPage = () => {
+    navigate("/board");
+  };
+
   return (
     <>
       <TopNav />
@@ -66,8 +71,8 @@ const Subscription = () => {
                 </div>
                 <div>Perfect if you don't have many chores. Lucky you.</div>
               </div>
-              <button className={styles.subscribe}>
-                <Link to="/board">Get Started</Link>
+              <button className={styles.subscribe} onClick={returnToPage}>
+                Get Started
               </button>
               <div className={styles.pricing}>
                 <div className="border-top"></div>

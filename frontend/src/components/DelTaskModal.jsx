@@ -71,13 +71,45 @@ const DelTaskModal = (props) => {
                     ></button>
                   </div>
 
-                  <div className="d-flex flex-column justify-content-center align-items-start m-3">
-                    <div>{props.data.title}</div>
-                    <div className="mt-3">{props.data.assigned_user}</div>
-                    <div>{props.data.deadline}</div>
-                    <div>{props.data.status}</div>
-                    <div>{props.data.created_by}</div>
-                    <div>{props.data.rule}</div>
+                  <div className="d-flex flex-column justify-content-center align-items-between m-3">
+                    <div className="h4">{props.data.title}</div>
+                    <hr className="col-12"></hr>
+                    <div className="h5">Details</div>
+                    <div>
+                      <div className="mt-3 row">
+                        <div className="col-6">Assigned Member</div>
+                        {props.members.map((member) => {
+                          if (member.uuid === props.data.assigned_user) {
+                            return <div className="col-6">{member.name}</div>;
+                          }
+                        })}
+                      </div>
+                      <div className="mt-3 row">
+                        <div className="col-6">To Be Completed By</div>
+                        {/* <div className="col-4"></div> */}
+                        <div className="col-6">
+                          {new Date(props.data.deadline).toLocaleDateString()}
+                        </div>
+                      </div>
+                      <div className="mt-3 row">
+                        <div className="col-6">Author</div>
+                        {props.members.map((member) => {
+                          if (member.uuid === props.data.created_by) {
+                            return <div className="col-6">{member.name}</div>;
+                          }
+                        })}
+                      </div>
+                      <div className="mt-3 row">
+                        <div className="col-6">Scheduled</div>
+                        <div className="col-6">
+                          {props.data.rule ? props.data.rule : "ONE TIME"}
+                        </div>
+                      </div>
+                      <div className="mt-3 row">
+                        <div className="col-6">Status</div>
+                        <div className="col-6">{props.data.status}</div>
+                      </div>
+                    </div>
                     <div className="d-flex mt-3">
                       <div type="button">
                         <i

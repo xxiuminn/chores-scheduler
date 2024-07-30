@@ -1,9 +1,9 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import React, { useContext, useEffect, useState } from "react";
 import useFetch from "../hooks/useFetch";
-import UserContext from "../context/user";
 import { jwtDecode } from "jwt-decode";
-import NavBar from "../components/NavBar";
+import TopNav from "../components/TopNav";
+import styles from "../components/Subscribe.module.css";
 
 const UserProfile = () => {
   const fetchData = useFetch();
@@ -59,15 +59,15 @@ const UserProfile = () => {
 
   return (
     <>
-      <NavBar />
+      <TopNav />
       {isSuccess && (
-        <>
+        <div className={styles.background}>
           <div className="d-flex flex-column justify-content-center align-items-center m-5">
             <div>
               <div className="mb-2">
                 <h5>Manage Your Personal Information.</h5>
               </div>
-              <div className="mb-4">
+              <div className="mb-4 text-center">
                 You are using a {data.account_type} account.
               </div>
               <form
@@ -113,7 +113,7 @@ const UserProfile = () => {
               </form>
             </div>
           </div>
-        </>
+        </div>
       )}
     </>
   );
