@@ -14,7 +14,7 @@ const TaskCards = (props) => {
   const { data, isSuccess, isFetching } = useQuery({
     queryKey: ["task"],
     queryFn: async () => {
-      console.log("start query");
+      // console.log("start query");
       return await fetchData(
         "/tasks/" + props.task.id,
         undefined,
@@ -42,11 +42,13 @@ const TaskCards = (props) => {
         // data-bs-toggle="modal"
         // data-bs-target="#viewtaskmodal"
       >
-        <div>
+        <div className="h5">
           <b>{props.task.title}</b>
         </div>
-        <div>{props.task.name}</div>
-        <div>{props.task.status}</div>
+        <div>
+          <p>{props.task.status}</p>
+        </div>
+        <div className="border-top">{props.task.name}</div>
       </div>
 
       {isSuccess && openTaskModal && (
