@@ -5,17 +5,16 @@ import useFetch from "../hooks/useFetch";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { jwtDecode } from "jwt-decode";
 import TaskCards from "./TaskCards";
-import { Link, useNavigate } from "react-router-dom";
-import NavBar from "./NavBar";
-import JoinGroup from "./JoinGroup";
+import { useNavigate } from "react-router-dom";
+import TopNav from "./TopNav";
 
 const Calendar = () => {
   const fetchData = useFetch();
   const queryClient = useQueryClient();
   const accessToken = localStorage.getItem("token");
-  console.log(accessToken);
+  // console.log(accessToken);
   const claims = jwtDecode(accessToken);
-  console.log(claims);
+  // console.log(claims);
   const [userData, setUserData] = useState("");
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [year, setYear] = useState(selectedDate.getFullYear());
@@ -114,7 +113,7 @@ const Calendar = () => {
   const { data: getUserData } = useQuery({
     queryKey: ["user"],
     queryFn: async () => {
-      console.log("get user data please");
+      // console.log("get user data please");
       return await fetchData(
         "/users/" + claims.uuid,
         undefined,
@@ -126,7 +125,7 @@ const Calendar = () => {
 
   useEffect(() => {
     if (getUserData) {
-      console.log(getUserData);
+      // console.log(getUserData);
       setUserData(getUserData);
     }
   }, [getUserData]);
@@ -136,8 +135,8 @@ const Calendar = () => {
   const { data } = useQuery({
     queryKey: ["tasks"],
     queryFn: async () => {
-      console.log("start fetch tasks");
-      console.log(userData);
+      // console.log("start fetch tasks");
+      // console.log(userData);
       return await fetchData(
         "/tasks/usergroup",
         "POST",
@@ -164,7 +163,7 @@ const Calendar = () => {
   const { data: membersData } = useQuery({
     queryKey: ["activemembers"],
     queryFn: async () => {
-      console.log("start fetch members");
+      // console.log("start fetch members");
       return await fetchData(
         "/usergroups/members/",
         "POST",
@@ -180,125 +179,106 @@ const Calendar = () => {
 
   useEffect(() => {
     if (membersData) {
-      console.log(membersData);
+      // console.log(membersData);
       // props.handleMembersData(membersData);
     }
   }, [membersData]);
 
   const logout = () => {
     // useCtx.setAccessToken("");
-    console.log("clearing token from local storage");
+    // console.log("clearing token from local storage");
     localStorage.removeItem("token");
     queryClient.removeQueries();
 
     // console.log("clearing token from context");
     // useCtx.setAccessToken("");
 
-    console.log("navigating to login page");
+    // console.log("navigating to login page");
     navigate("/login");
-    console.log("logged out");
+    // console.log("logged out");
   };
 
   return (
     <>
       {userData.group_id && userData.membership === "ACTIVE" && (
-        <div className={styles.board}>
-          <div className={styles.topnav}>
-            <div className={styles.topleftnav}>
-              <NavBar />
-              <div>
-                <h3>{thisMonth}</h3>
+        <>
+          <TopNav />
+          <div className={styles.board}>
+            <div className={styles.topnav}>
+              <div className={styles.topleftnav}>
+                {/* <NavBar /> */}
+                <div>
+                  <h3>{thisMonth}</h3>
+                </div>
               </div>
-            </div>
 
-            <div className={styles.toprightnav}>
-              <div className="dropdown">
-                <button
-                  className={`dropdown-toggle ${styles.profile}`}
-                  type="button"
-                  data-bs-toggle="dropdown"
-                >
-                  <i className="bi bi-person"></i>
+              <div className={styles.toprightnav}>
+                <button className={styles.prevnext} onClick={handlePrev}>
+                  <i className="bi bi-chevron-left"></i>
                 </button>
-                <ul className="dropdown-menu">
-                  <li>
-                    <Link to="/userprofile" className="dropdown-item">
-                      Edit profile info
-                    </Link>
-                  </li>
-                  <li>
-                    <div className="dropdown-item" onClick={logout}>
-                      Logout
-                    </div>
-                  </li>
-                </ul>
+                <button className={styles.prevnext} onClick={handleNext}>
+                  <i className="bi bi-chevron-right"></i>
+                </button>
               </div>
-
-              <button className={styles.prevnext} onClick={handlePrev}>
-                <i className="bi bi-chevron-left"></i>
-              </button>
-              <button className={styles.prevnext} onClick={handleNext}>
-                <i className="bi bi-chevron-right"></i>
-              </button>
             </div>
-          </div>
 
-          <div className={styles.calendar}>
-            <div className={styles.day}>
-              {daysInWeek.map((date, index) =>
-                getMonthArr().map((item) => {
-                  if (item.weekOfDate === week && item.day === index) {
-                    return (
-                      <div className={styles.day}>
-                        <div className={styles.date}>{date}</div>
-                        <div
-                          key={item.fullDate}
-                          className={
-                            item.fullDate.toDateString() ==
-                            selectedDate.toDateString()
-                              ? styles.selected
-                              : styles.date
-                          }
-                          onClick={() => setSelectedDate(item.fullDate)}
-                        >
-                          {item.date}
-                        </div>
-                        <button
-                          type="button"
-                          // data-bs-toggle="modal"
-                          // data-bs-target="#addtaskmodal"
-                          className={styles.addtask}
-                          onClick={() => handleModalDate(item.fullDate)}
-                          closeModal={closeModal}
-                        >
-                          <i className="bi bi-plus"></i> Add Task
-                        </button>
-                        {show && (
-                          <AddTaskModal
-                            modalDate={modalDate}
+            <div className={styles.calendar}>
+              <div className={styles.day}>
+                {daysInWeek.map((date, index) =>
+                  getMonthArr().map((item) => {
+                    if (item.weekOfDate === week && item.day === index) {
+                      return (
+                        <div className={styles.day}>
+                          <div className={styles.date}>{date}</div>
+                          <div
+                            key={item.fullDate}
+                            className={
+                              item.fullDate.toDateString() ==
+                              selectedDate.toDateString()
+                                ? styles.selected
+                                : styles.date
+                            }
+                            onClick={() => setSelectedDate(item.fullDate)}
+                          >
+                            {item.date}
+                          </div>
+                          <button
+                            type="button"
+                            // data-bs-toggle="modal"
+                            // data-bs-target="#addtaskmodal"
+                            className={styles.addtask}
+                            onClick={() => handleModalDate(item.fullDate)}
                             closeModal={closeModal}
-                            members={membersData}
-                            userData={userData}
-                          />
-                        )}
-                        {tasks.map((task) => {
-                          if (
-                            new Date(task.deadline).toLocaleDateString() ===
-                            item.fullDate.toLocaleDateString().split("T")[0]
-                          ) {
-                            return (
-                              <TaskCards task={task} members={membersData} />
-                            );
-                          }
-                        })}
-                      </div>
-                    );
-                  }
-                })
-              )}
+                          >
+                            <i className="bi bi-plus"></i> Add Task
+                          </button>
+                          {show && (
+                            <AddTaskModal
+                              modalDate={modalDate}
+                              closeModal={closeModal}
+                              members={membersData}
+                              userData={userData}
+                            />
+                          )}
+                          {tasks.map((task) => {
+                            if (
+                              new Date(task.deadline).toLocaleDateString() ===
+                              item.fullDate.toLocaleDateString().split("T")[0]
+                            ) {
+                              return (
+                                <TaskCards task={task} members={membersData} />
+                              );
+                            }
+                          })}
+                        </div>
+                      );
+                    }
+                  })
+                )}
+              </div>
             </div>
           </div>
-        </div>
+        </>
       )}
 
       {/* {!userData.group_id ||

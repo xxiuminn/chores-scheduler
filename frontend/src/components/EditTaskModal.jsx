@@ -42,7 +42,7 @@ const EditTaskModal = (props) => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries(["tasks"]);
-      console.log("update successful");
+      // console.log("update successful");
       props.handleEditModal();
     },
   });

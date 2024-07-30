@@ -68,14 +68,14 @@ const AddTaskModal = (props) => {
       ),
     onSuccess: () => {
       queryClient.invalidateQueries(["tasks"]);
-      console.log("successful");
+      // console.log("successful");
     },
   });
 
   const handleSubmit = (e) => {
     e.preventDefault();
     mutate();
-    console.log("form submitted");
+    // console.log("form submitted");
     props.closeModal();
   };
 

@@ -26,7 +26,7 @@ const DelTaskModal = (props) => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries(["tasks"]);
-      console.log("delete success");
+      // console.log("delete success");
       setDeleteType("");
     },
   });

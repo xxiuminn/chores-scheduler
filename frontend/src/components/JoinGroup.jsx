@@ -9,9 +9,9 @@ const JoinGroup = () => {
   const queryClient = useQueryClient();
   const fetchData = useFetch();
   const accessToken = localStorage.getItem("token");
-  console.log(accessToken);
+  // console.log(accessToken);
   const claims = jwtDecode(accessToken);
-  console.log(claims);
+  // console.log(claims);
   const [groupName, setGroupName] = useState("");
   const navigate = useNavigate();
 
@@ -20,7 +20,7 @@ const JoinGroup = () => {
   const { data: userData, isSuccess } = useQuery({
     queryKey: ["user"],
     queryFn: async () => {
-      console.log("get user data please");
+      // console.log("get user data please");
       return await fetchData(
         "/users/user/" + claims.uuid,
         undefined,
@@ -46,12 +46,12 @@ const JoinGroup = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries(["usergroup"]);
-      console.log("successful in creating group");
+      // console.log("successful in creating group");
       navigate("/board");
     },
   });
 
-  console.log(claims);
+  // console.log(claims);
 
   const { mutate: updateUser } = useMutation({
     mutationFn: async () => {
@@ -68,7 +68,7 @@ const JoinGroup = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries(["user"]);
-      console.log("successful in joining group invitation");
+      // console.log("successful in joining group invitation");
       navigate("/board");
     },
   });
