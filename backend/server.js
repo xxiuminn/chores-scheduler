@@ -14,7 +14,7 @@ const verifypayment = require("./src/routers/subscription");
 
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 200,
+  max: 300,
   standardHeaders: true,
   legacyHeaders: false,
 });
