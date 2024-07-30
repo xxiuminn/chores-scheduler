@@ -4,7 +4,9 @@
   min-height: 100vh;
   width: 100vw;
   padding: 1em 2em 1em 2em;
-  background-color: rgb(255, 255, 255);
+  /* background-color: rgb(255, 255, 255); */
+  background-image: url("/assets/beige-bg.png");
+  background-size: cover;
 }
 
 .topnav,
@@ -15,6 +17,10 @@
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
+}
+
+.calendar {
+  margin-top: 1em;
 }
 
 .calendar {
@@ -83,24 +89,33 @@ a {
 .addtask {
   background-color: rgba(234, 176, 101, 0.2);
   color: black;
+  box-shadow: 0 0 0.4em 0.1em rgba(147, 147, 147, 0.1);
 }
 
 .taskCard {
-  background-color: bisque;
+  background-color: rgb(255, 255, 255);
   border-radius: 1em;
   padding: 1em;
   width: 10em;
   overflow-x: auto;
   cursor: pointer;
+  border-left: solid;
+  border-width: 0.3em;
+  border-color: rgb(255, 177, 169);
+  box-shadow: 0 0 0.4em 0.1em rgba(147, 147, 147, 0.1);
 }
 
 .taskCardCompleted {
-  background-color: rgb(200, 234, 200);
+  background-color: rgb(255, 255, 255);
   border-radius: 1em;
   padding: 1em;
   width: 10em;
   overflow-x: auto;
   cursor: pointer;
+  border-left: solid;
+  border-width: 0.3em;
+  border-color: rgb(165, 195, 135);
+  box-shadow: 0 0 0.4em 0.1em rgba(147, 147, 147, 0.1);
 }
 
 /* 
