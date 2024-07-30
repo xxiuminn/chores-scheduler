@@ -1,0 +1,80 @@
+:root {
+  overflow-y: auto;
+}
+
+.background {
+  background-image: url("/assets/beige-bg.png");
+  background-size: cover;
+  width: 100vw;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: start;
+  align-items: center;
+  overflow: auto;
+}
+
+.subscription {
+  margin: 3em 3em 1em 3em;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(20em, 1fr));
+  gap: 1em;
+}
+
+.pricecard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background-color: rgb(255, 255, 255);
+  border-radius: 1em;
+  /* padding: 1em; */
+  width: 100%;
+  cursor: pointer;
+  box-shadow: 0 0 0.4em 0.1em rgba(147, 147, 147, 0.1);
+  margin-top: 3em;
+}
+
+.pricing {
+  margin: 1em;
+  width: 70%;
+  margin-top: 2em;
+  margin-bottom: 2em;
+}
+
+.title {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.pillshape {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 10em;
+  padding: 0em 1em 0em 1em;
+  background-color: rgb(251, 228, 231);
+  box-shadow: 0 0 0.4em 0.1em rgba(147, 147, 147, 0.1);
+}
+
+.subscribe {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(234, 176, 101, 0.2);
+  box-shadow: 0 0 0.4em 0.1em rgba(147, 147, 147, 0.1);
+  width: 70%;
+  color: black;
+}
+
+span {
+  text-decoration: none;
+}
+
+.icon {
+  color: rgb(165, 195, 135);
+}
