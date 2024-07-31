@@ -4,9 +4,8 @@ import useFetch from "../hooks/useFetch";
 import { useQuery } from "@tanstack/react-query";
 import { jwtDecode } from "jwt-decode";
 import { Link, useNavigate } from "react-router-dom";
-import UserContext from "../context/user";
 
-const Login = (props) => {
+const Login = () => {
   const fetchData = useFetch();
   const [viewPw, setViewPw] = useState(false);
   const [password, setPassword] = useState("");
@@ -14,7 +13,6 @@ const Login = (props) => {
   const [inputType, setInputType] = useState("password");
   const navigate = useNavigate();
   const [isLogin, setIsLogin] = useState(false);
-  // const [userData, setUserData] = useState("");
 
   const { data } = useQuery({
     queryKey: ["login"],
@@ -39,8 +37,6 @@ const Login = (props) => {
       const decoded = jwtDecode(data.access);
       console.log("login successful");
       refetch();
-      // navigate("/board");
-      // setIsLogin(false);
     }
   }, [data]);
 
@@ -57,7 +53,7 @@ const Login = (props) => {
     queryFn: async () => {
       console.log("get user data please");
       return await fetchData(
-        "/users/userinfo",
+        "/users/user",
         undefined,
         undefined,
         localStorage.getItem("token")

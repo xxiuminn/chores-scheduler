@@ -2,7 +2,7 @@ import React from "react";
 import styles from "../components/Calendar.module.css";
 import { Link } from "react-router-dom";
 
-const NavBar = () => {
+const NavBar = (props) => {
   return (
     <>
       <button
@@ -10,7 +10,12 @@ const NavBar = () => {
         data-bs-toggle="offcanvas"
         data-bs-target="#offcanvas"
         aria-controls="offcanvas"
-        className={styles.opennavbar}
+        className={
+          props.userData.membership === "ACTIVE"
+            ? styles.opennavbar
+            : styles.opennavbardisabled
+        }
+        disabled={props.userData.membership === "ACTIVE" ? false : true}
       >
         <i className="bi bi-arrow-right"></i>
       </button>

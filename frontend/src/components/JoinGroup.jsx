@@ -10,30 +10,23 @@ const JoinGroup = () => {
   const queryClient = useQueryClient();
   const fetchData = useFetch();
   const accessToken = localStorage.getItem("token");
-  const claims = jwtDecode(accessToken);
   const [groupName, setGroupName] = useState("");
   const navigate = useNavigate();
 
   const { data: user } = useQuery({
     queryKey: ["user"],
     queryFn: async () => {
-      return await fetchData(
-        "/users/user/" + claims.uuid,
-        undefined,
-        undefined,
-        accessToken
-      );
+      return await fetchData("/users/user", undefined, undefined, accessToken);
     },
   });
 
   // fetch user info
 
   const { data: userData, isSuccess } = useQuery({
-    queryKey: ["user", user],
+    queryKey: ["user", user?.group_id],
     queryFn: async () => {
-      // console.log("get user data please");
       return await fetchData(
-        "/users/" + claims.uuid,
+        "/users/userinfo",
         undefined,
         undefined,
         accessToken
@@ -51,19 +44,15 @@ const JoinGroup = () => {
         {
           usergroup_name: groupName,
           account_type: "FREE",
-          uuid: claims.uuid,
         },
         accessToken
       );
     },
     onSuccess: () => {
       queryClient.invalidateQueries(["usergroup"]);
-      // console.log("successful in creating group");
       navigate("/board");
     },
   });
-
-  // console.log(claims);
 
   const { mutate: acceptGroup } = useMutation({
     mutationFn: async () => {
@@ -72,7 +61,6 @@ const JoinGroup = () => {
         "PATCH",
         {
           group_id: userData.group_id,
-          uuid: claims.uuid,
           membership: "ACTIVE",
         },
         accessToken
@@ -80,7 +68,6 @@ const JoinGroup = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries(["user"]);
-      // console.log("successful in joining group invitation");
       navigate("/board");
     },
   });
@@ -92,7 +79,6 @@ const JoinGroup = () => {
         "PATCH",
         {
           group_id: null,
-          uuid: claims.uuid,
           membership: null,
         },
         accessToken

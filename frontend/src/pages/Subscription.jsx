@@ -25,7 +25,6 @@ const Subscription = () => {
 
   useEffect(() => {
     if (subscribeData) {
-      console.log(subscribeData);
       window.location = subscribeData.url;
     }
   }, [subscribeData]);

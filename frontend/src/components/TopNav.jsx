@@ -25,16 +25,9 @@ const TopNav = () => {
     queryKey: ["user"],
     queryFn: async () => {
       console.log("start fetching user data");
-      return await fetchData(
-        "/users/userinfo",
-        undefined,
-        undefined,
-        accessToken
-      );
+      return await fetchData("/users/user", undefined, undefined, accessToken);
     },
   });
-
-  console.log(userData);
 
   return (
     <>
@@ -42,7 +35,7 @@ const TopNav = () => {
       {userDataSuccess && (
         <div className="row mx-4 my-3">
           <div className={styles.topnav}>
-            <NavBar />
+            <NavBar userData={userData} />
             <div>
               Welcome <b>{userData.name}</b>
             </div>

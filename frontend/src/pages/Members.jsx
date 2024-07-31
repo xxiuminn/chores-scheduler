@@ -3,12 +3,15 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import useFetch from "../hooks/useFetch";
 import TopNav from "../components/TopNav";
 import styles from "../components/Subscribe.module.css";
+import { useNavigate } from "react-router-dom";
+import { jwtDecode } from "jwt-decode";
 
 const Members = () => {
   const fetchData = useFetch();
   const accessToken = localStorage.getItem("token");
   const queryClient = useQueryClient();
   const [emailInvited, setEmailInvited] = useState("");
+  const navigate = useNavigate();
 
   // fetch user info
   const { data: getUserData, isSuccess: userDataSuccess } = useQuery({
@@ -41,26 +44,6 @@ const Members = () => {
     enabled: !!getUserData?.group_id,
   });
 
-  // quit, remove or cancel invite from user group
-  const { mutate: removeMember } = useMutation({
-    mutationFn: async (uuid) => {
-      return await fetchData(
-        "/users/update",
-        "PATCH",
-        {
-          group_id: null,
-          uuid: uuid,
-          membership: null,
-        },
-        accessToken
-      );
-    },
-    onSuccess: () => {
-      console.log("removed member");
-      queryClient.invalidateQueries(["members"]);
-    },
-  });
-
   // convert email to uuid
   const { data: getuuid, refetch } = useQuery({
     queryKey: ["emailtouuid"],
@@ -77,6 +60,7 @@ const Members = () => {
 
   useEffect(() => {
     if (getuuid) {
+      console.log(getuuid);
       inviteMember();
     }
   }, [getuuid]);
@@ -84,28 +68,50 @@ const Members = () => {
   // Invite to user group
   const { mutate: inviteMember } = useMutation({
     mutationFn: async () => {
+      console.log("run");
       return await fetchData(
-        "/users/update",
+        "/users/invite",
         "PATCH",
         {
           group_id: getUserData.group_id,
-          uuid: getuuid,
           membership: "INVITED",
+          uuid: getuuid,
         },
         accessToken
       );
     },
     onSuccess: () => {
       console.log("user invited");
-      queryClient.invalidateQueries(["invitedmembers"]);
+      queryClient.invalidateQueries(["members"]);
       setEmailInvited("");
     },
   });
 
   const handleInvite = (e) => {
     e.preventDefault();
-    inviteMember();
+    refetch();
   };
+
+  // quit, remove or cancel invite from user group
+  const { mutate: removeMember } = useMutation({
+    mutationFn: async (memberuuid) => {
+      return await fetchData(
+        "/users/remove",
+        "PATCH",
+        {
+          uuid: memberuuid,
+        },
+        accessToken
+      );
+    },
+    onSuccess: () => {
+      console.log("user invited");
+      queryClient.invalidateQueries(["members"]);
+      setEmailInvited("");
+      if (getuuid === jwtDecode(localStorage.getItem("token").uuid))
+        navigate("/joingroup");
+    },
+  });
 
   return (
     <>
@@ -139,7 +145,7 @@ const Members = () => {
                 <div className="col-3"></div>
               </div>
               <div className="row justify-content-center">
-                <button onClick={refetch}>Invite</button>
+                <button type="submit">Invite</button>
               </div>
             </form>
 
