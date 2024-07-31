@@ -19,6 +19,7 @@ const subscribe = async (req, res) => {
       "SELECT group_id FROM users WHERE uuid=$1",
       [req.decoded.uuid]
     );
+    console.log(usergroupArr);
     console.log(usergroupArr.rows[0].group_id);
     const usergroup = usergroupArr.rows[0].group_id;
     console.log(usergroup);

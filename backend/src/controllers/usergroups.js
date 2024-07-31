@@ -28,7 +28,7 @@ const createUserGroup = async (req, res) => {
 
     await client.query(
       "UPDATE users SET group_id=$1, membership='ACTIVE' WHERE uuid=$2",
-      [userGroupId, req.body.uuid]
+      [userGroupId, req.decoded.uuid]
     );
     await client.query("COMMIT");
     res.json({ status: "ok", msg: "user group created" });

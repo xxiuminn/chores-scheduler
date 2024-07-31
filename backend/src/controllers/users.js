@@ -28,6 +28,23 @@ const seedUsers = async (req, res) => {
   }
 };
 
+const getUser = async (req, res) => {
+  try {
+    const user = await db.query("SELECT * FROM users WHERE uuid = $1", [
+      req.decoded.uuid,
+    ]);
+
+    if (!user.rows.length) {
+      return res.status(400).json({ status: "error", msg: "user not found" });
+    }
+
+    res.json(user.rows[0]);
+  } catch (error) {
+    console.error(error.message);
+    res.status(400).json({ status: "error", msg: "error getting user info" });
+  }
+};
+
 const getUserInfo = async (req, res) => {
   try {
     const user = await db.query(
@@ -107,9 +124,38 @@ const updateUserInfo = async (req, res) => {
   }
 };
 
+const inviteUser = async (req, res) => {
+  try {
+    await db.query(
+      "UPDATE users SET group_id= $1, membership = $2 WHERE uuid = $3",
+      [req.body.group_id, req.body.membership, req.body.uuid]
+    );
+    res.json({ status: "ok", msg: "user invited" });
+  } catch (error) {
+    console.error(error.message);
+    res.status(400).json({ status: "error", msg: "error inviting user" });
+  }
+};
+
+const removeUser = async (req, res) => {
+  try {
+    await db.query(
+      "UPDATE users SET group_id= null, membership = null WHERE uuid = $1",
+      [req.body.uuid]
+    );
+    res.json({ status: "ok", msg: "user removed" });
+  } catch (error) {
+    console.error(error.message);
+    res.status(400).json({ status: "error", msg: "error inviting user" });
+  }
+};
+
 module.exports = {
   seedUsers,
+  getUser,
   getUserInfo,
   updateUserInfo,
   getUserByEmail,
+  inviteUser,
+  removeUser,
 };

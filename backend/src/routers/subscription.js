@@ -4,6 +4,6 @@ const { subscribe, verifypayment } = require("../controllers/subscription");
 const { authFree } = require("../middleware/auth");
 
 router.post("/create-checkout-session", authFree, subscribe);
-router.post("/webhook", authFree, verifypayment);
+router.post("/webhook", verifypayment);
 
 module.exports = router;
