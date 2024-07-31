@@ -79,6 +79,8 @@ const Register = (props) => {
                 onChange={(e) => setPassword(e.target.value)}
                 value={password}
                 required
+                maxLength="50"
+                minLength="8"
               ></input>
               {!viewPw && (
                 <i

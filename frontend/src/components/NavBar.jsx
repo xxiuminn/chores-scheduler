@@ -34,7 +34,7 @@ const NavBar = () => {
           <ul className="options">
             <li>
               <Link to="/board">
-                <i class="bi bi-calendar-heart m-3"></i>Your Family Board
+                <i className="bi bi-calendar-heart m-3"></i>Your Family Board
               </Link>
             </li>
             <br />
@@ -46,7 +46,7 @@ const NavBar = () => {
             <br />
             <li>
               <Link to="/subscribe">
-                <i class="bi bi-hand-thumbs-up m-3"></i>Upgrade Plan
+                <i className="bi bi-hand-thumbs-up m-3"></i>Upgrade Plan
               </Link>
             </li>
           </ul>

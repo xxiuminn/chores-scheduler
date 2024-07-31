@@ -1,20 +1,21 @@
-import React, { useContext, useState } from "react";
+import React, { useState } from "react";
 import styles from "./Calendar.module.css";
 import DelTaskModal from "./DelTaskModal";
 import useFetch from "../hooks/useFetch";
 import { useQuery } from "@tanstack/react-query";
-import UserContext from "../context/user";
 
 const TaskCards = (props) => {
   const [openTaskModal, setOpenTaskModal] = useState(false);
-  // const useCtx = useContext(UserContext);
   const accessToken = localStorage.getItem("token");
   const fetchData = useFetch();
 
-  const { data, isSuccess, isFetching } = useQuery({
-    queryKey: ["task"],
+  const {
+    data: taskInfo,
+    isSuccess,
+    isError,
+  } = useQuery({
+    queryKey: ["task", props.task.id],
     queryFn: async () => {
-      // console.log("start query");
       return await fetchData(
         "/tasks/" + props.task.id,
         undefined,
@@ -38,9 +39,6 @@ const TaskCards = (props) => {
             : styles.taskCardCompleted
         }
         onClick={handleOpenModal}
-        // type="button"
-        // data-bs-toggle="modal"
-        // data-bs-target="#viewtaskmodal"
       >
         <div className="h5">
           <b>{props.task.title}</b>
@@ -51,11 +49,13 @@ const TaskCards = (props) => {
         <div className="border-top">{props.task.name}</div>
       </div>
 
+      {isError && <div>oops error getting individual task data</div>}
       {isSuccess && openTaskModal && (
         <DelTaskModal
+          key={props.task.id + "del"}
           userData={props.userData}
-          data={data}
-          task={props.task}
+          taskInfo={taskInfo}
+          // task={props.task}
           handleOpenModal={handleOpenModal}
           members={props.members}
         />

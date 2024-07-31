@@ -49,14 +49,15 @@ const Login = (props) => {
     setInputType(type);
   };
 
-  // fetch user info
+  // fetch user info to check if user is an active member of any group.
+  // to redirect to different first page.
 
   const { data: getUserData, refetch } = useQuery({
     queryKey: ["user"],
     queryFn: async () => {
       console.log("get user data please");
       return await fetchData(
-        "/users/user/" + jwtDecode(localStorage.getItem("token")).uuid,
+        "/users/userinfo",
         undefined,
         undefined,
         localStorage.getItem("token")

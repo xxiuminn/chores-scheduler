@@ -1,35 +1,33 @@
 const db = require("../db/db");
 
-// const seedTasks = async (req, res) => {
-//   try {
-//     await db.query("DELETE FROM tasks");
-//   } catch (error) {
-//     console.error(error.message);
-//     res.status(400).json({ status: "error", msg: "error seeding tasks" });
-//   }
-// };
-
 const createTaskGroup = async (req, res) => {
   const client = await db.connect();
   try {
     await client.query("BEGIN");
 
+    // get user data
+    const user = await client.query(
+      "SELECT group_id FROM users WHERE uuid = $1",
+      [req.decoded.uuid]
+    );
+
+    const usergroupId = user.rows[0].group_id;
+
     //for member rotation
     const members = await client.query(
       "SELECT uuid FROM users WHERE group_id = $1",
-      [req.body.usergroup_id]
+      [usergroupId]
     );
-    // console.log(members.rows);
+
     const numMembers = members.rowCount;
     let memberIndex = members.rows.findIndex(
       (element) => element.uuid === req.body.assigned_user
     );
-    // console.log(memberIndex);
 
     //check if usergroup account is paid or free
     const accountTypeArr = await client.query(
       "SELECT account_type FROM user_groups WHERE id=$1",
-      [req.body.usergroup_id]
+      [usergroupId]
     );
 
     const accountType = accountTypeArr.rows[0].account_type;
@@ -43,10 +41,8 @@ const createTaskGroup = async (req, res) => {
         [Boolean(req.body.is_recurring)]
       );
 
-      // const taskGroup = await db.query("SELECT * FROM task_groups");
       const { rows } = taskGroup;
       const taskGroupId = rows[0].id;
-      // console.log(taskGroupId);
 
       await client.query(
         "INSERT INTO tasks(title, deadline, assigned_user, created_by, group_id) VALUES($1,$2,$3,$4,$5)",
@@ -54,7 +50,7 @@ const createTaskGroup = async (req, res) => {
           req.body.title,
           req.body.deadline,
           req.body.assigned_user,
-          req.body.created_by,
+          req.decoded.uuid,
           taskGroupId,
         ]
       );
@@ -94,7 +90,7 @@ const createTaskGroup = async (req, res) => {
               req.body.title,
               deadline.toLocaleDateString(),
               req.body.assigned_user,
-              req.body.created_by,
+              req.decoded.uuid,
               taskGroupId,
             ]
           );
@@ -104,15 +100,13 @@ const createTaskGroup = async (req, res) => {
           if (memberIndex === numMembers) {
             memberIndex = 0;
           }
-          // console.log(memberIndex);
-          // console.log(members.rows[memberIndex].uuid);
           await client.query(
             "INSERT INTO tasks(title, deadline, assigned_user, created_by, group_id) VALUES($1, $2, $3, $4, $5)",
             [
               req.body.title,
               deadline.toLocaleDateString(),
               members.rows[memberIndex].uuid,
-              req.body.created_by,
+              req.decoded.uuid,
               taskGroupId,
             ]
           );
@@ -170,7 +164,7 @@ const getTasksByUser = async (req, res) => {
 const getTask = async (req, res) => {
   try {
     const task = await db.query(
-      "SELECT tasks.id, tasks.title, tasks.deadline, tasks.assigned_user, tasks.created_by, tasks.status, task_groups.is_recurring, task_groups.is_rotate, task_groups.rule FROM tasks INNER JOIN task_groups ON tasks.group_id = task_groups.id WHERE tasks.id = $1",
+      "SELECT tasks.id, tasks.title, tasks.deadline, tasks.assigned_user, tasks.created_by, tasks.status, tasks.modified_at, tasks.last_modified_by, task_groups.is_recurring, task_groups.is_rotate, task_groups.rule FROM tasks INNER JOIN task_groups ON tasks.group_id = task_groups.id WHERE tasks.id = $1",
       [req.params.task_id]
     );
 
@@ -196,7 +190,6 @@ const delTask = async (req, res) => {
     );
 
     const groupTaskId = taskGroup.rows[0].group_id;
-    // console.log(groupTaskId);
 
     const task = await client.query("SELECT * FROM tasks WHERE group_id=$1", [
       groupTaskId,
@@ -244,9 +237,7 @@ const delAllTasks = async (req, res) => {
         .json({ status: "error", msg: "task cannot be found" });
     }
 
-    // console.log(task);
     const groupTaskId = task.rows[0].group_id;
-    // console.log(groupTaskId);
 
     await client.query("DELETE FROM tasks WHERE group_id = $1", [groupTaskId]);
 
@@ -301,15 +292,7 @@ const delFollowingTasks = async (req, res) => {
 
 const updateTask = async (req, res) => {
   try {
-    const {
-      task_id,
-      title,
-      deadline,
-      // date_modified,
-      status,
-      last_modified_by,
-      assigned_user,
-    } = req.body;
+    const { task_id, title, deadline, status, assigned_user } = req.body;
 
     const task = await db.query("SELECT * FROM tasks WHERE id=$1", [task_id]);
 
@@ -318,7 +301,6 @@ const updateTask = async (req, res) => {
     }
 
     const taskInfo = task.rows[0];
-    // console.log(taskInfo);
 
     const updated = {
       title: title === (undefined || taskInfo.title) ? taskInfo.title : title,
@@ -327,10 +309,9 @@ const updateTask = async (req, res) => {
           ? taskInfo.deadline
           : deadline,
       modified_at: new Date(),
-      // date_modified === undefined ? taskInfo.date_modified : date_modified,
       status:
         status === (undefined || taskInfo.status) ? taskInfo.status : status,
-      last_modified_by: last_modified_by,
+      last_modified_by: req.decoded.uuid,
       assigned_user:
         assigned_user === (undefined || taskInfo.assigned_user)
           ? taskInfo.assigned_user
@@ -338,13 +319,12 @@ const updateTask = async (req, res) => {
     };
 
     await db.query(
-      "UPDATE tasks set title=$1, deadline=$2, modified_at=$3, status=$4, last_modified_by=$5, assigned_user=$6 WHERE id=$7",
+      "UPDATE tasks set title=$1, deadline=$2, modified_at=$3, status=$4,  assigned_user=$5 WHERE id=$6",
       [
         updated.title,
         updated.deadline,
         updated.modified_at,
         updated.status,
-        updated.last_modified_by,
         updated.assigned_user,
         task_id,
       ]
@@ -360,14 +340,7 @@ const updateAllTasks = async (req, res) => {
   const client = await db.connect();
   try {
     await client.query("BEGIN");
-    const {
-      task_id,
-      title,
-      deadline,
-      status,
-      last_modified_by,
-      assigned_user,
-    } = req.body;
+    const { task_id, title, deadline, status, assigned_user } = req.body;
 
     const task = await client.query(
       "SELECT tasks.id, tasks.title, tasks.deadline, tasks.modified_at, tasks.status, tasks.last_modified_by, tasks.assigned_user, tasks.group_id, task_groups.is_recurring, task_groups.is_rotate, task_groups.rule FROM tasks INNER JOIN task_groups ON tasks.group_id = task_groups.id WHERE tasks.id=$1",
@@ -385,10 +358,8 @@ const updateAllTasks = async (req, res) => {
     ]);
 
     const taskArr = tasks.rows;
-    // console.log(taskArr);
 
     const ogDeadline = task.rows[0].deadline;
-    // console.log(ogDeadline);
     const addNum = new Date(deadline) - ogDeadline;
     const addNumInDays = Math.floor(addNum / (1000 * 60 * 60 * 24));
 
@@ -404,10 +375,6 @@ const updateAllTasks = async (req, res) => {
         deadline: deadline === undefined ? taskArr[i].deadline : newDeadline(),
         modified_at: new Date(),
         status: status === undefined ? taskArr[i].status : status,
-        last_modified_by:
-          last_modified_by === undefined
-            ? taskArr[i].last_modified_by
-            : last_modified_by,
         assigned_user:
           assigned_user === undefined
             ? taskArr[i].assigned_user
@@ -415,13 +382,12 @@ const updateAllTasks = async (req, res) => {
       };
 
       await client.query(
-        "UPDATE tasks set title=$1, deadline=$2, modified_at=$3, status=$4, last_modified_by=$5, assigned_user=$6 WHERE id=$7",
+        "UPDATE tasks set title=$1, deadline=$2, modified_at=$3, status=$4,  assigned_user=$5 WHERE id=$6",
         [
           updated.title,
           updated.deadline,
           updated.modified_at,
           updated.status,
-          updated.last_modified_by,
           updated.assigned_user,
           taskArr[i].id,
         ]
@@ -442,15 +408,8 @@ const updateFollowingTasks = async (req, res) => {
   const client = await db.connect();
   try {
     await client.query("BEGIN");
-    const {
-      task_id,
-      title,
-      deadline,
-      modified_at,
-      status,
-      last_modified_by,
-      assigned_user,
-    } = req.body;
+    const { task_id, title, deadline, modified_at, status, assigned_user } =
+      req.body;
 
     const task = await client.query(
       "SELECT tasks.id, tasks.title, tasks.deadline, tasks.modified_at, tasks.status, tasks.last_modified_by, tasks.assigned_user, tasks.group_id, task_groups.is_recurring, task_groups.is_rotate, task_groups.rule FROM tasks INNER JOIN task_groups ON tasks.group_id = task_groups.id WHERE tasks.id=$1",
@@ -469,7 +428,6 @@ const updateFollowingTasks = async (req, res) => {
     );
 
     const taskArr = tasks.rows;
-    // console.log(taskArr);
 
     const ogDeadline = task.rows[0].deadline;
     console.log(ogDeadline);
@@ -489,10 +447,6 @@ const updateFollowingTasks = async (req, res) => {
         modified_at:
           modified_at === undefined ? taskArr[i].modified_at : modified_at,
         status: status === undefined ? taskArr[i].status : status,
-        last_modified_by:
-          last_modified_by === undefined
-            ? taskArr[i].last_modified_by
-            : last_modified_by,
         assigned_user:
           assigned_user === undefined
             ? taskArr[i].assigned_user
@@ -500,13 +454,12 @@ const updateFollowingTasks = async (req, res) => {
       };
 
       await client.query(
-        "UPDATE tasks set title=$1, deadline=$2, modified_at=$3, status=$4, last_modified_by=$5, assigned_user=$6 WHERE id=$7",
+        "UPDATE tasks set title=$1, deadline=$2, modified_at=$3, status=$4,  assigned_user=$5 WHERE id=$6",
         [
           updated.title,
           updated.deadline,
           updated.modified_at,
           updated.status,
-          updated.last_modified_by,
           updated.assigned_user,
           taskArr[i].id,
         ]
@@ -524,7 +477,6 @@ const updateFollowingTasks = async (req, res) => {
 };
 
 module.exports = {
-  // seedTasks,
   createTaskGroup,
   getTasksByUserGroup,
   getTasksByUser,

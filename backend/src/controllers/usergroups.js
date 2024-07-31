@@ -7,7 +7,6 @@ const seedAccountTypes = async (req, res) => {
       "INSERT INTO accounts(types) VALUES($1), ($2)",
       ["FREE", "PAID"]
     );
-    // console.log(accountTypes);
     res.json({ status: "ok", msg: "account types seeded" });
   } catch (error) {
     console.error(error.message);
@@ -17,14 +16,6 @@ const seedAccountTypes = async (req, res) => {
   }
 };
 
-// const seedUserGroups = async (req, res) => {
-//   try {
-//   } catch (error) {
-//     console.error(error.message);
-//     res.status(400).json({ status: "error", msg: "error seeding user groups" });
-//   }
-// };
-
 const createUserGroup = async (req, res) => {
   const client = await db.connect();
   try {
@@ -33,11 +24,7 @@ const createUserGroup = async (req, res) => {
       "INSERT INTO user_groups(name, account_type) VALUES($1,$2) RETURNING id",
       [req.body.usergroup_name, req.body.account_type]
     );
-
-    // console.log(userGroup);
     const userGroupId = userGroup.rows[0].id;
-
-    // console.log(userGroupId);
 
     await client.query(
       "UPDATE users SET group_id=$1, membership='ACTIVE' WHERE uuid=$2",
@@ -86,7 +73,7 @@ const updateAccountType = async (req, res) => {
 
 const getGroupMembers = async (req, res) => {
   try {
-    const { usergroup_id, membership } = req.body;
+    const { usergroup_id } = req.body;
     const members = await db.query("SELECT * FROM users WHERE group_id = $1", [
       usergroup_id,
     ]);

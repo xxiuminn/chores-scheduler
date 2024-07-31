@@ -1,24 +1,21 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import React, { useContext, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import useFetch from "../hooks/useFetch";
-import { jwtDecode } from "jwt-decode";
 import TopNav from "../components/TopNav";
 import styles from "../components/Subscribe.module.css";
 
 const UserProfile = () => {
   const fetchData = useFetch();
-  // const useCtx = useContext(UserContext);
   const accessToken = localStorage.getItem("token");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const queryClient = useQueryClient();
-  const uuid = jwtDecode(accessToken).uuid;
   const [changedAlert, setChangedAlert] = useState(false);
 
   const { data, isSuccess } = useQuery({
     queryKey: ["user"],
     queryFn: async () =>
-      await fetchData("/users/" + uuid, undefined, undefined, accessToken),
+      await fetchData("/users/userInfo", undefined, undefined, accessToken),
   });
 
   const { mutate } = useMutation({
@@ -29,7 +26,6 @@ const UserProfile = () => {
         {
           name,
           email,
-          uuid,
         },
         accessToken
       );
@@ -106,7 +102,7 @@ const UserProfile = () => {
                   Save
                 </button>
                 {changedAlert && (
-                  <div class="alert alert-success" role="alert">
+                  <div className="alert alert-success" role="alert">
                     Changed successful
                   </div>
                 )}

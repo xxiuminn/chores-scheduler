@@ -1,28 +1,21 @@
-import React, { useContext, useEffect, useState } from "react";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import React, { useEffect, useState } from "react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import useFetch from "../hooks/useFetch";
-import UserContext from "../context/user";
 import { jwtDecode } from "jwt-decode";
 
 const AddTaskModal = (props) => {
-  // const useCtx = useContext(UserContext);
   const queryClient = useQueryClient();
   const [deadline, setDeadline] = useState("");
   const [title, setTitle] = useState("");
   const [isRecurring, setIsRecurring] = useState("");
   const [isRotate, setIsRotate] = useState("");
-  const [userGroupId, setUserGroupId] = useState("");
   const [assignedUser, setAssignedUser] = useState("");
   const [rule, setRule] = useState("");
-  const [createdBy, setCreatedBy] = useState("");
   const [schedule, setSchedule] = useState("");
   const fetchData = useFetch();
 
   const accessToken = localStorage.getItem("token");
   const claims = jwtDecode(accessToken);
-  // console.log(claims);
-
-  // console.log(props.members);
 
   useEffect(() => {
     if (props.modalDate) {
@@ -58,25 +51,20 @@ const AddTaskModal = (props) => {
           title,
           deadline,
           assigned_user: assignedUser,
-          created_by: claims.uuid,
           is_rotate: isRotate,
           rule,
-          // usergroup_id: claims.group_id,
-          usergroup_id: props.userData.group_id,
         },
         accessToken
       ),
     onSuccess: () => {
       queryClient.invalidateQueries(["tasks"]);
-      // console.log("successful");
     },
   });
 
   const handleSubmit = (e) => {
     e.preventDefault();
     mutate();
-    // console.log("form submitted");
-    props.closeModal();
+    props.closemodal();
   };
 
   return (
@@ -88,8 +76,7 @@ const AddTaskModal = (props) => {
               <button
                 type="button"
                 className="btn-close align-self-end me-3 mt-3"
-                onClick={() => props.closeModal()}
-                // data-bs-dismiss="modal"
+                onClick={() => props.closemodal()}
                 aria-label="Close"
               ></button>
               <h1 className="modal-title">Argh another chore</h1>
@@ -247,12 +234,17 @@ const AddTaskModal = (props) => {
                   required
                   onChange={(e) => setAssignedUser(e.target.value)}
                   value={assignedUser}
+                  key={assignedUser}
                 >
                   <option value="" disabled selected>
                     Pick a member
                   </option>
                   {props.members.map((member) => {
-                    return <option value={member.uuid}>{member.name}</option>;
+                    return (
+                      <option value={member.uuid} key={member.uuid}>
+                        {member.name}
+                      </option>
+                    );
                   })}
                 </select>
 

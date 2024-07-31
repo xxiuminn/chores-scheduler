@@ -1,7 +1,6 @@
 import React, { useEffect } from "react";
 import useFetch from "../hooks/useFetch";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { jwtDecode } from "jwt-decode";
+import { useQuery } from "@tanstack/react-query";
 import TopNav from "../components/TopNav";
 import styles from "../components/Subscribe.module.css";
 import { useNavigate } from "react-router-dom";
@@ -9,21 +8,7 @@ import { useNavigate } from "react-router-dom";
 const Subscription = () => {
   const fetchData = useFetch();
   const accessToken = localStorage.getItem("token");
-  const queryClient = useQueryClient();
   const navigate = useNavigate();
-
-  //retrieve user's group:
-  const { data: usergroupData } = useQuery({
-    queryKey: ["usergroup"],
-    queryFn: async () => {
-      return await fetchData(
-        "/users/" + jwtDecode(accessToken).uuid,
-        undefined,
-        undefined,
-        accessToken
-      );
-    },
-  });
 
   const { data: subscribeData, refetch: subscribeRefetch } = useQuery({
     queryKey: ["subscription"],
@@ -31,7 +16,7 @@ const Subscription = () => {
       return await fetchData(
         "/subscribe/create-checkout-session",
         "POST",
-        { uuid: jwtDecode(accessToken).uuid },
+        undefined,
         accessToken
       );
     },
@@ -39,7 +24,7 @@ const Subscription = () => {
   });
 
   useEffect(() => {
-    if (subscribeData && usergroupData) {
+    if (subscribeData) {
       console.log(subscribeData);
       window.location = subscribeData.url;
     }
@@ -52,7 +37,7 @@ const Subscription = () => {
   return (
     <>
       <TopNav />
-      <container className={styles.background}>
+      <div className={styles.background}>
         <div className={styles.subscription}>
           <div className="h3 text-center">
             Seamless Scheduling, Anytime, Anywhere
@@ -124,7 +109,7 @@ const Subscription = () => {
             </div>
           </div>
         </div>
-      </container>
+      </div>
     </>
   );
 };

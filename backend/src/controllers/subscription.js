@@ -6,20 +6,18 @@ const subscribe = async (req, res) => {
   try {
     const session = await stripe.checkout.sessions.create({
       mode: "subscription",
-      success_url: "http://localhost:5173/subscribe",
-      cancel_url: "http://localhost:5173/subscribe",
+      success_url: process.env.SUCCESS_URL,
+      cancel_url: process.env.CANCEL_URL,
       line_items: [{ price: process.env.STRIPE_PRICE_ID, quantity: 1 }],
     });
-    // console.log("session: ", session.id, session.url, session);
 
     const sessionId = session.id;
-    // console.log("sessionId: ", sessionId);
 
     //save session.id to the user in the database
     //get group id using uuid
     const usergroupArr = await db.query(
       "SELECT group_id FROM users WHERE uuid=$1",
-      [req.body.uuid]
+      [req.decoded.uuid]
     );
     console.log(usergroupArr.rows[0].group_id);
     const usergroup = usergroupArr.rows[0].group_id;
@@ -62,7 +60,6 @@ const verifypayment = async (req, res) => {
     data = event.data;
     console.log(data);
     eventType = event.type;
-    // console.log(eventType);
   } else {
     data = req.body.data;
     eventType = req.body.type;
@@ -77,8 +74,6 @@ const verifypayment = async (req, res) => {
       "UPDATE user_groups SET account_type='PAID' WHERE stripe_session_id=$1",
       [data.object.id]
     );
-    // res.json(data.object.status)
-    // res.json({received: true})
     return res.json({ status: "ok", message: "payment success" });
   } else return res.json({ received: true });
 };

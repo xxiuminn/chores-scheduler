@@ -1,12 +1,10 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import React, { useContext, useState } from "react";
+import React, { useState } from "react";
 import useFetch from "../hooks/useFetch";
-import UserContext from "../context/user";
 import EditTaskModal from "./EditTaskModal";
 
 const DelTaskModal = (props) => {
   const fetchData = useFetch();
-  // const useCtx = useContext(UserContext);
   const [openDelAlert, setOpenDelAlert] = useState(false);
   const [openEditForm, setOpenEditForm] = useState(false);
   const [deleteType, setDeleteType] = useState("");
@@ -19,14 +17,13 @@ const DelTaskModal = (props) => {
         "/tasks/" + deleteType,
         "DELETE",
         {
-          task_id: props.data.id,
+          task_id: props.taskInfo.id,
         },
         accessToken
       );
     },
     onSuccess: () => {
       queryClient.invalidateQueries(["tasks"]);
-      // console.log("delete success");
       setDeleteType("");
     },
   });
@@ -42,14 +39,6 @@ const DelTaskModal = (props) => {
 
   return (
     <>
-      {/* <div
-        className="modal fade"
-        id="viewtaskmodal"
-        tabindex="-1"
-        aria-labelledby="viewtaskmodal"
-        aria-hidden="true"
-      > */}
-
       {!openDelAlert && !openEditForm && (
         // modal to view task
         <>
@@ -66,35 +55,35 @@ const DelTaskModal = (props) => {
                       type="button"
                       className="btn-close align-self-end me-3 mt-3"
                       onClick={props.handleOpenModal}
-                      // data-bs-dismiss="modal"
                       aria-label="Close"
                     ></button>
                   </div>
 
                   <div className="d-flex flex-column justify-content-center align-items-between m-3">
-                    <div className="h4">{props.data.title}</div>
+                    <div className="h4">{props.taskInfo.title}</div>
                     <hr className="col-12"></hr>
                     <div className="h5">Details</div>
                     <div>
                       <div className="mt-3 row">
                         <div className="col-6">Assigned Member</div>
                         {props.members.map((member) => {
-                          if (member.uuid === props.data.assigned_user) {
+                          if (member.uuid === props.taskInfo.assigned_user) {
                             return <div className="col-6">{member.name}</div>;
                           }
                         })}
                       </div>
                       <div className="mt-3 row">
                         <div className="col-6">To Be Completed By</div>
-                        {/* <div className="col-4"></div> */}
                         <div className="col-6">
-                          {new Date(props.data.deadline).toLocaleDateString()}
+                          {new Date(
+                            props.taskInfo.deadline
+                          ).toLocaleDateString()}
                         </div>
                       </div>
                       <div className="mt-3 row">
                         <div className="col-6">Author</div>
                         {props.members.map((member) => {
-                          if (member.uuid === props.data.created_by) {
+                          if (member.uuid === props.taskInfo.created_by) {
                             return <div className="col-6">{member.name}</div>;
                           }
                         })}
@@ -102,19 +91,21 @@ const DelTaskModal = (props) => {
                       <div className="mt-3 row">
                         <div className="col-6">Schedule</div>
                         <div className="col-6">
-                          {props.data.rule ? props.data.rule : "ONE TIME"}
+                          {props.taskInfo.rule
+                            ? props.taskInfo.rule
+                            : "ONE TIME"}
                         </div>
                       </div>
                       <div className="mt-3 row">
                         <div className="col-6">Status</div>
-                        <div className="col-6">{props.data.status}</div>
+                        <div className="col-6">{props.taskInfo.status}</div>
                       </div>
                       <div className="mt-3 row">
                         <div className="col-6">Last Modified</div>
-                        {props.data.modified_at ? (
+                        {props.taskInfo.modified_at ? (
                           <div className="col-6">
                             {new Date(
-                              props.data.modified_at
+                              props.taskInfo.modified_at
                             ).toLocaleDateString()}
                           </div>
                         ) : (
@@ -124,7 +115,7 @@ const DelTaskModal = (props) => {
                       <div className="mt-3 row">
                         <div className="col-6">Last Modified By</div>
                         {props.members.map((member) => {
-                          if (member.uuid === props.data.last_modified_by) {
+                          if (member.uuid === props.taskInfo.last_modified_by) {
                             return <div className="col-6">{member.name}</div>;
                           }
                         })}
@@ -168,7 +159,6 @@ const DelTaskModal = (props) => {
                     type="button"
                     className="btn-close align-self-end me-3 mt-3"
                     onClick={() => setOpenDelAlert(false)}
-                    // data-bs-dismiss="modal"
                     aria-label="Close"
                   ></button>
                   <h1 className="modal-title">Delete Chore</h1>
@@ -198,7 +188,7 @@ const DelTaskModal = (props) => {
                         </label>
                       </div>
 
-                      {props.data.is_recurring && (
+                      {props.taskInfo.is_recurring && (
                         <>
                           <div className="form-check form-check">
                             <input
@@ -267,9 +257,9 @@ const DelTaskModal = (props) => {
 
       {openEditForm && (
         <EditTaskModal
+          key={props.taskInfo.id + "edit"}
           userData={props.userData}
-          data={props.data}
-          task={props.task}
+          taskInfo={props.taskInfo}
           handleEditModal={handleEditModal}
           members={props.members}
         />

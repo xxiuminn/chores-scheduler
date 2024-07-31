@@ -1,18 +1,18 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import React, { useContext, useState } from "react";
 import useFetch from "../hooks/useFetch";
-import UserContext from "../context/user";
 import { jwtDecode } from "jwt-decode";
 
 const EditTaskModal = (props) => {
   const fetchData = useFetch();
   const accessToken = localStorage.getItem("token");
-  // const useCtx = useContext(UserContext);
   const queryClient = useQueryClient();
-  const [title, setTitle] = useState(props.data.title);
-  const [status, setStatus] = useState(props.data.status);
+  const [title, setTitle] = useState(props.taskInfo.title);
+  const [status, setStatus] = useState(props.taskInfo.status);
   const [updateType, setUpdateType] = useState("");
-  const formattedDeadline = new Date(props.data.deadline).toLocaleDateString();
+  const formattedDeadline = new Date(
+    props.taskInfo.deadline
+  ).toLocaleDateString();
   const [deadline, setDeadline] = useState(
     formattedDeadline.split("/")[2] +
       "-" +
@@ -21,8 +21,9 @@ const EditTaskModal = (props) => {
       formattedDeadline.split("/")[0]
   );
 
-  const [assignedUser, setAssignedUser] = useState(props.data.assigned_user);
-  // console.log(props.task.id);
+  const [assignedUser, setAssignedUser] = useState(
+    props.taskInfo.assigned_user
+  );
 
   const { mutate } = useMutation({
     mutationFn: async () => {
@@ -34,15 +35,13 @@ const EditTaskModal = (props) => {
           deadline,
           assigned_user: assignedUser,
           status,
-          task_id: props.data.id,
-          last_modified_by: jwtDecode(accessToken).uuid,
+          task_id: props.taskInfo.id,
         },
         accessToken
       );
     },
     onSuccess: () => {
       queryClient.invalidateQueries(["tasks"]);
-      // console.log("update successful");
       props.handleEditModal();
     },
   });
@@ -62,7 +61,6 @@ const EditTaskModal = (props) => {
               <button
                 type="button"
                 className="btn-close align-self-end me-3 mt-3"
-                // data-bs-dismiss="modal"
                 onClick={props.handleEditModal}
                 aria-label="Close"
               ></button>
@@ -156,7 +154,7 @@ const EditTaskModal = (props) => {
                     </label>
                   </div>
 
-                  {props.data.is_recurring && (
+                  {props.taskInfo.is_recurring && (
                     <>
                       <div className="form-check form-check">
                         <input

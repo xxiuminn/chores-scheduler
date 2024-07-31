@@ -1,7 +1,6 @@
 const { body, param } = require("express-validator");
 
 const validateCreateTaskGroup = [
-  body("usergroup_id", "user group id is required").notEmpty().isInt(),
   body("assigned_user", "assigned user is required").notEmpty().isString(),
   body("is_recurring", "is recurring is required").notEmpty().isInt(),
   body("title", "title is required").notEmpty().isString(),
@@ -14,7 +13,6 @@ const validateCreateTaskGroup = [
     .optional({ checkFalsy: true })
     .notEmpty()
     .isString(),
-  body("created_by", "created by is required").notEmpty().isString(),
 ];
 
 const validateGetTaskByUserGroup = [
