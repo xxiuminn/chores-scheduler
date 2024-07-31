@@ -112,6 +112,7 @@ const AddTaskModal = (props) => {
                     required
                     onChange={(e) => setTitle(e.target.value)}
                     value={title}
+                    maxLength="50"
                   ></input>
                   <div id="instruction1" className="form-text">
                     Include a title below 50 characters.
@@ -163,6 +164,9 @@ const AddTaskModal = (props) => {
                       required
                       checked={schedule === "DAILY"}
                       onChange={() => handleRecurringRule("DAILY")}
+                      disabled={
+                        props.userData.account_type === "FREE" ? true : false
+                      }
                     />
                     <label className="form-check-label" htmlFor="daily">
                       Daily
@@ -179,6 +183,9 @@ const AddTaskModal = (props) => {
                       required
                       checked={schedule === "WEEKLY"}
                       onChange={() => handleRecurringRule("WEEKLY")}
+                      disabled={
+                        props.userData.account_type === "FREE" ? true : false
+                      }
                     />
                     <label className="form-check-label" htmlFor="weekly">
                       Weekly

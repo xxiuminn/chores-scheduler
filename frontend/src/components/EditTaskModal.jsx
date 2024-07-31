@@ -86,6 +86,7 @@ const EditTaskModal = (props) => {
                     required
                     onChange={(e) => setTitle(e.target.value)}
                     value={title}
+                    maxLength="50"
                   ></input>
                   <div id="instruction1" className="form-text">
                     Include a title below 50 characters.
@@ -167,6 +168,11 @@ const EditTaskModal = (props) => {
                           required
                           checked={updateType === "updatefollowing"}
                           onChange={() => setUpdateType("updatefollowing")}
+                          disabled={
+                            props.userData.account_type === "FREE"
+                              ? true
+                              : false
+                          }
                         />
                         <label
                           className="form-check-label"
@@ -186,6 +192,11 @@ const EditTaskModal = (props) => {
                           required
                           checked={updateType === "updateall"}
                           onChange={() => setUpdateType("updateall")}
+                          disabled={
+                            props.userData.account_type === "FREE"
+                              ? true
+                              : false
+                          }
                         />
                         <label className="form-check-label" htmlFor="updateall">
                           All chores

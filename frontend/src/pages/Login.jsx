@@ -76,6 +76,11 @@ const Login = (props) => {
     }
   }, [getUserData]);
 
+  const handleLogin = (e) => {
+    e.preventDefault();
+    setIsLogin(!isLogin);
+  };
+
   return (
     <>
       <div className={styles.bg}>
@@ -85,7 +90,7 @@ const Login = (props) => {
             <p>Welcome back.</p>
           </div>
 
-          <div className={styles.form}>
+          <form className={styles.form} onSubmit={handleLogin}>
             <label htmlFor="email">Email</label>
             <div className={styles.inputbox}>
               <input
@@ -93,6 +98,7 @@ const Login = (props) => {
                 type="email"
                 id="email"
                 onChange={(e) => setEmail(e.target.value)}
+                required
               ></input>
             </div>
             <label htmlFor="password">Password</label>
@@ -103,6 +109,7 @@ const Login = (props) => {
                 type={inputType}
                 onChange={(e) => setPassword(e.target.value)}
                 value={password}
+                required
               ></input>
               {!viewPw && (
                 <i
@@ -117,14 +124,14 @@ const Login = (props) => {
                 ></i>
               )}
             </div>
-            <button onClick={() => setIsLogin(!isLogin)}>Sign In</button>
+            <button>Sign In</button>
             <div>
               Don't have an account?{" "}
-              <span>
+              <span className={styles.link}>
                 <Link to="/register">Join</Link>
               </span>
             </div>
-          </div>
+          </form>
         </div>
       </div>
     </>

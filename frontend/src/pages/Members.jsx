@@ -151,9 +151,7 @@ const Members = () => {
             <div className="col-3"></div>
           </div>
           <div className="row justify-content-center">
-            <button onClick={refetch} className="">
-              Invite
-            </button>
+            <button onClick={refetch}>Invite</button>
           </div>
         </form>
 
@@ -170,8 +168,8 @@ const Members = () => {
                 if (member.membership === "ACTIVE")
                   return (
                     <div className="row mb-3 border-top p-2">
-                      <div className="col-4">{member.name}</div>
-                      <div className="col-4">{member.email}</div>
+                      <div className="col-3">{member.name}</div>
+                      <div className="col-5">{member.email}</div>
 
                       {member.email === claims.email ? (
                         <button
@@ -208,8 +206,8 @@ const Members = () => {
                 if (member.membership === "INVITED")
                   return (
                     <div className="row mb-3 border-top p-2">
-                      <div className="col-4">{member.name}</div>
-                      <div className="col-4">{member.email}</div>
+                      <div className="col-3">{member.name}</div>
+                      <div className="col-5">{member.email}</div>
 
                       <button
                         className="col-4"

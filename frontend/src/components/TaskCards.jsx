@@ -53,6 +53,7 @@ const TaskCards = (props) => {
 
       {isSuccess && openTaskModal && (
         <DelTaskModal
+          userData={props.userData}
           data={data}
           task={props.task}
           handleOpenModal={handleOpenModal}

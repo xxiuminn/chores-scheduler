@@ -30,10 +30,16 @@ const Register = (props) => {
     },
   });
 
+  const handleRegister = (e) => {
+    e.preventDefault();
+    mutate();
+  };
+
   const handleShowPw = (type) => {
     setViewPw(!viewPw);
     setInputType(type);
   };
+
   return (
     <>
       <div className={styles.bg}>
@@ -43,7 +49,7 @@ const Register = (props) => {
             <p>For an account.</p>
           </div>
 
-          <div className={styles.form}>
+          <form className={styles.form} onSubmit={handleRegister}>
             <label htmlFor="name">Name</label>
             <div className={styles.inputbox}>
               <input
@@ -51,6 +57,7 @@ const Register = (props) => {
                 type="name"
                 id="name"
                 onChange={(e) => setName(e.target.value)}
+                required
               ></input>
             </div>
             <label htmlFor="email">Email</label>
@@ -60,6 +67,7 @@ const Register = (props) => {
                 type="email"
                 id="email"
                 onChange={(e) => setEmail(e.target.value)}
+                required
               ></input>
             </div>
             <label htmlFor="password">Password</label>
@@ -70,6 +78,7 @@ const Register = (props) => {
                 type={inputType}
                 onChange={(e) => setPassword(e.target.value)}
                 value={password}
+                required
               ></input>
               {!viewPw && (
                 <i
@@ -84,14 +93,14 @@ const Register = (props) => {
                 ></i>
               )}
             </div>
-            <button onClick={mutate}>Join</button>
+            <button type="submit">Join</button>
             <div>
               Have an account?{" "}
-              <span>
+              <span className={styles.link}>
                 <Link to="/login">Sign in</Link>
               </span>
             </div>
-          </div>
+          </form>
         </div>
       </div>
     </>

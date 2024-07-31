@@ -4,23 +4,19 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { jwtDecode } from "jwt-decode";
 import { useNavigate } from "react-router-dom";
 import TopNav from "./TopNav";
+import styles from "./Subscribe.module.css";
 
 const JoinGroup = () => {
   const queryClient = useQueryClient();
   const fetchData = useFetch();
   const accessToken = localStorage.getItem("token");
-  // console.log(accessToken);
   const claims = jwtDecode(accessToken);
-  // console.log(claims);
   const [groupName, setGroupName] = useState("");
   const navigate = useNavigate();
 
-  // fetch user info
-
-  const { data: userData, isSuccess } = useQuery({
+  const { data: user } = useQuery({
     queryKey: ["user"],
     queryFn: async () => {
-      // console.log("get user data please");
       return await fetchData(
         "/users/user/" + claims.uuid,
         undefined,
@@ -28,6 +24,22 @@ const JoinGroup = () => {
         accessToken
       );
     },
+  });
+
+  // fetch user info
+
+  const { data: userData, isSuccess } = useQuery({
+    queryKey: ["user", user],
+    queryFn: async () => {
+      // console.log("get user data please");
+      return await fetchData(
+        "/users/" + claims.uuid,
+        undefined,
+        undefined,
+        accessToken
+      );
+    },
+    enabled: !!user?.group_id,
   });
 
   //create group
@@ -53,7 +65,7 @@ const JoinGroup = () => {
 
   // console.log(claims);
 
-  const { mutate: updateUser } = useMutation({
+  const { mutate: acceptGroup } = useMutation({
     mutationFn: async () => {
       return await fetchData(
         "/users/update",
@@ -73,43 +85,114 @@ const JoinGroup = () => {
     },
   });
 
+  const { mutate: rejectGroup } = useMutation({
+    mutationFn: async () => {
+      return await fetchData(
+        "/users/update",
+        "PATCH",
+        {
+          group_id: null,
+          uuid: claims.uuid,
+          membership: null,
+        },
+        accessToken
+      );
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries(["user"]);
+    },
+  });
+
+  const handleCreateGroup = (e) => {
+    e.preventDefault();
+    createGroup();
+  };
+
   return (
     <>
       <TopNav />
-      <div className="d-flex flex-column justify-content-center align-items-start m-3">
-        <form className="d-flex flex-column justify-content-center align-items-start needs-validation m-2">
-          <div>
-            You currently don't have a group yet. Create a group to gain access
-            to the free account features.
+      <div className={styles.background}>
+        <form
+          className="form-check container text-center needs-validation mt-5 mb-5 col-6"
+          noValidate
+          onSubmit={handleCreateGroup}
+        >
+          <div className="h3 row justify-content-center mb-3">Join A Group</div>
+          <div className="row justify-content-center mb-3">
+            Start by creating a group name.
           </div>
-          <div className="mt-3">
-            <label htmlFor="groupname" className="form-label">
-              Group Name
-            </label>
+          <div className="row justify-content-center">
+            <div className="col-3"></div>
             <input
               type="text"
-              className="form-control"
-              id="groupname"
+              className="form-control col-6 rounded mb-3 p-2"
               required
               onChange={(e) => setGroupName(e.target.value)}
               value={groupName}
+              placeholder="Group Name"
             ></input>
-            <button type="button" className="mt-3" onClick={createGroup}>
-              Create
-            </button>
+            <div className="col-3"></div>
+          </div>
+          <div className="row justify-content-center">
+            <button type="submit">Create</button>
           </div>
         </form>
 
         {isSuccess && userData.membership === "INVITED" && (
-          <form className="d-flex flex-column justify-content-center align-items-start needs-validation m-2">
-            <label htmlFor="invite" className="form-label">
-              You are invited to join a group.
-            </label>
-            <button type="button" className="mt-3" onClick={updateUser}>
-              Join now
-            </button>
-          </form>
+          <div className="container col-6 mt-5">
+            <div className="h3 row justify-content-center">You Are Invited</div>
+            <div className="row justify-content-center mb-3">
+              Note that once you have accepted the invite, you will lose all
+              access to your existing group, if any.
+            </div>
+            <div className="row mb-3 border-top p-2 justify-content-between">
+              <div className="col-3">{userData.group_name}</div>
+              <div className="col-3"></div>
+              <button className="col-2 me-1" onClick={acceptGroup}>
+                Join
+              </button>
+              <button className="col-2 me-1" onClick={rejectGroup}>
+                Reject
+              </button>
+            </div>
+          </div>
         )}
+
+        {/* <div className="d-flex flex-column justify-content-center align-items-start m-3">
+          <form className="d-flex flex-column justify-content-center align-items-start needs-validation m-2">
+            <div>
+              You currently don't have a group yet. Create a group to gain
+              access to the free account features.
+            </div>
+            <div className="mt-3">
+              <label htmlFor="groupname" className="form-label">
+                Group Name
+              </label>
+              <input
+                type="text"
+                className="form-control"
+                id="groupname"
+                required
+                onChange={(e) => setGroupName(e.target.value)}
+                value={groupName}
+              ></input>
+              <button type="button" className="mt-3" onClick={createGroup}>
+                Create
+              </button>
+            </div>
+          </form>
+
+          {isSuccess && userData.membership === "INVITED" && (
+            <form className="d-flex flex-column justify-content-center align-items-start needs-validation m-2">
+              <label htmlFor="invite" className="form-label">
+                You are invited to join a group.
+              </label>
+              <button type="button" className="mt-3" onClick={updateUser}>
+                Join now
+              </button>
+            </form>
+          )}
+        </div> */}
       </div>
     </>
   );

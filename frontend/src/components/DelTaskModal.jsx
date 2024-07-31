@@ -100,7 +100,7 @@ const DelTaskModal = (props) => {
                         })}
                       </div>
                       <div className="mt-3 row">
-                        <div className="col-6">Scheduled</div>
+                        <div className="col-6">Schedule</div>
                         <div className="col-6">
                           {props.data.rule ? props.data.rule : "ONE TIME"}
                         </div>
@@ -108,6 +108,26 @@ const DelTaskModal = (props) => {
                       <div className="mt-3 row">
                         <div className="col-6">Status</div>
                         <div className="col-6">{props.data.status}</div>
+                      </div>
+                      <div className="mt-3 row">
+                        <div className="col-6">Last Modified</div>
+                        {props.data.modified_at ? (
+                          <div className="col-6">
+                            {new Date(
+                              props.data.modified_at
+                            ).toLocaleDateString()}
+                          </div>
+                        ) : (
+                          <div className="col-6">Not Modified Yet</div>
+                        )}
+                      </div>
+                      <div className="mt-3 row">
+                        <div className="col-6">Last Modified By</div>
+                        {props.members.map((member) => {
+                          if (member.uuid === props.data.last_modified_by) {
+                            return <div className="col-6">{member.name}</div>;
+                          }
+                        })}
                       </div>
                     </div>
                     <div className="d-flex mt-3">
@@ -190,6 +210,11 @@ const DelTaskModal = (props) => {
                               required
                               checked={deleteType === "deletefollowing"}
                               onChange={() => setDeleteType("deletefollowing")}
+                              disabled={
+                                props.userData.account_type === "FREE"
+                                  ? true
+                                  : false
+                              }
                             />
                             <label
                               className="form-check-label"
@@ -209,6 +234,11 @@ const DelTaskModal = (props) => {
                               required
                               checked={deleteType === "deleteall"}
                               onChange={() => setDeleteType("deleteall")}
+                              disabled={
+                                props.userData.account_type === "FREE"
+                                  ? true
+                                  : false
+                              }
                             />
                             <label
                               className="form-check-label"
@@ -237,6 +267,7 @@ const DelTaskModal = (props) => {
 
       {openEditForm && (
         <EditTaskModal
+          userData={props.userData}
           data={props.data}
           task={props.task}
           handleEditModal={handleEditModal}

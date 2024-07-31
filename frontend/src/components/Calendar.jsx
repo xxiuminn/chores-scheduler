@@ -266,7 +266,11 @@ const Calendar = () => {
                               item.fullDate.toLocaleDateString().split("T")[0]
                             ) {
                               return (
-                                <TaskCards task={task} members={membersData} />
+                                <TaskCards
+                                  task={task}
+                                  members={membersData}
+                                  userData={userData}
+                                />
                               );
                             }
                           })}
