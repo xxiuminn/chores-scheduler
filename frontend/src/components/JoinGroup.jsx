@@ -13,14 +13,14 @@ const JoinGroup = () => {
   const [groupName, setGroupName] = useState("");
   const navigate = useNavigate();
 
+  // fetch user info
+
   const { data: user } = useQuery({
     queryKey: ["user"],
     queryFn: async () => {
       return await fetchData("/users/user", undefined, undefined, accessToken);
     },
   });
-
-  // fetch user info
 
   const { data: userData, isSuccess } = useQuery({
     queryKey: ["user", user?.group_id],
@@ -67,7 +67,7 @@ const JoinGroup = () => {
       );
     },
     onSuccess: () => {
-      queryClient.invalidateQueries(["user"]);
+      queryClient.invalidateQueries(["members"]);
       navigate("/board");
     },
   });
@@ -85,7 +85,7 @@ const JoinGroup = () => {
       );
     },
     onSuccess: () => {
-      queryClient.invalidateQueries(["user"]);
+      queryClient.invalidateQueries(["members"]);
     },
   });
 
@@ -143,42 +143,6 @@ const JoinGroup = () => {
             </div>
           </div>
         )}
-
-        {/* <div className="d-flex flex-column justify-content-center align-items-start m-3">
-          <form className="d-flex flex-column justify-content-center align-items-start needs-validation m-2">
-            <div>
-              You currently don't have a group yet. Create a group to gain
-              access to the free account features.
-            </div>
-            <div className="mt-3">
-              <label htmlFor="groupname" className="form-label">
-                Group Name
-              </label>
-              <input
-                type="text"
-                className="form-control"
-                id="groupname"
-                required
-                onChange={(e) => setGroupName(e.target.value)}
-                value={groupName}
-              ></input>
-              <button type="button" className="mt-3" onClick={createGroup}>
-                Create
-              </button>
-            </div>
-          </form>
-
-          {isSuccess && userData.membership === "INVITED" && (
-            <form className="d-flex flex-column justify-content-center align-items-start needs-validation m-2">
-              <label htmlFor="invite" className="form-label">
-                You are invited to join a group.
-              </label>
-              <button type="button" className="mt-3" onClick={updateUser}>
-                Join now
-              </button>
-            </form>
-          )}
-        </div> */}
       </div>
     </>
   );

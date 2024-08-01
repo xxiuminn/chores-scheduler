@@ -117,12 +117,20 @@ const EditTaskModal = (props) => {
                   value={assignedUser}
                 >
                   {props.members.map((member) => {
-                    return <option value={member.uuid}>{member.name}</option>;
+                    return (
+                      <option
+                        value={member.uuid}
+                        key={`set-assign-member-${member.uuid}`}
+                      >
+                        {member.name}
+                      </option>
+                    );
                   })}
                 </select>
 
                 <label className="form-label mt-2">Status</label>
                 <select
+                  key={`task-status-${props.taskInfo.id}`}
                   className="form-select"
                   aria-label=".form-select status"
                   required
@@ -130,7 +138,11 @@ const EditTaskModal = (props) => {
                   value={status}
                 >
                   {["IN PROGRESS", "COMPLETED"].map((state) => {
-                    return <option value={state}>{state}</option>;
+                    return (
+                      <option value={state} key={state}>
+                        {state}
+                      </option>
+                    );
                   })}
                 </select>
 
@@ -166,6 +178,7 @@ const EditTaskModal = (props) => {
                           required
                           checked={updateType === "updatefollowing"}
                           onChange={() => setUpdateType("updatefollowing")}
+                          key={`is-recurring-${props.taskInfo}`}
                           disabled={
                             props.userData.account_type === "FREE"
                               ? true
@@ -182,6 +195,7 @@ const EditTaskModal = (props) => {
 
                       <div className="form-check form-check">
                         <input
+                          key={`update-option-${props.taskInfo.id}`}
                           className="form-check-input"
                           type="radio"
                           name="updatechore"

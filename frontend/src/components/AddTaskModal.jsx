@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import useFetch from "../hooks/useFetch";
-import { jwtDecode } from "jwt-decode";
 
 const AddTaskModal = (props) => {
   const queryClient = useQueryClient();
@@ -15,7 +14,6 @@ const AddTaskModal = (props) => {
   const fetchData = useFetch();
 
   const accessToken = localStorage.getItem("token");
-  const claims = jwtDecode(accessToken);
 
   useEffect(() => {
     if (props.modalDate) {

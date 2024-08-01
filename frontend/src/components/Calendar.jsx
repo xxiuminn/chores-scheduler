@@ -5,10 +5,12 @@ import useFetch from "../hooks/useFetch";
 import { useQuery } from "@tanstack/react-query";
 import TaskCards from "./TaskCards";
 import TopNav from "./TopNav";
+import { jwtDecode } from "jwt-decode";
 
 const Calendar = () => {
   const fetchData = useFetch();
   const accessToken = localStorage.getItem("token");
+  const claims = jwtDecode(accessToken);
 
   // states for creating weekly view calendar
   const [selectedDate, setSelectedDate] = useState(new Date());
@@ -108,7 +110,7 @@ const Calendar = () => {
     isSuccess: userDataSuccess,
     isError: userDataError,
   } = useQuery({
-    queryKey: ["user"],
+    queryKey: ["user", claims.uuid],
     queryFn: async () => {
       console.log("start fetching user data");
       return await fetchData(
@@ -197,7 +199,10 @@ const Calendar = () => {
                   getMonthArr().map((item) => {
                     if (item.weekOfDate === week && item.day === index) {
                       return (
-                        <div className={styles.day}>
+                        <div
+                          className={styles.day}
+                          key={item.fullDate.toISOString()}
+                        >
                           <div className={styles.date}>{date}</div>
                           <div
                             key={item.fullDate}
@@ -220,7 +225,7 @@ const Calendar = () => {
                           </button>
                           {showModal && (
                             <AddTaskModal
-                              key={item.fullDate + "addtaskmodal"}
+                              key={`add-task-modal-${item.fullDate}`}
                               modalDate={modalDate}
                               closemodal={closemodal}
                               members={membersData}

@@ -68,7 +68,14 @@ const DelTaskModal = (props) => {
                         <div className="col-6">Assigned Member</div>
                         {props.members.map((member) => {
                           if (member.uuid === props.taskInfo.assigned_user) {
-                            return <div className="col-6">{member.name}</div>;
+                            return (
+                              <div
+                                className="col-6"
+                                key={`assigned-user-${member.uuid}`}
+                              >
+                                {member.name}
+                              </div>
+                            );
                           }
                         })}
                       </div>
@@ -84,7 +91,14 @@ const DelTaskModal = (props) => {
                         <div className="col-6">Author</div>
                         {props.members.map((member) => {
                           if (member.uuid === props.taskInfo.created_by) {
-                            return <div className="col-6">{member.name}</div>;
+                            return (
+                              <div
+                                className="col-6"
+                                key={`author-${member.uuid}`}
+                              >
+                                {member.name}
+                              </div>
+                            );
                           }
                         })}
                       </div>
@@ -116,7 +130,14 @@ const DelTaskModal = (props) => {
                         <div className="col-6">Last Modified By</div>
                         {props.members.map((member) => {
                           if (member.uuid === props.taskInfo.last_modified_by) {
-                            return <div className="col-6">{member.name}</div>;
+                            return (
+                              <div
+                                className="col-6"
+                                key={`last-modified-${member.uuid}`}
+                              >
+                                {member.name}
+                              </div>
+                            );
                           }
                         })}
                       </div>

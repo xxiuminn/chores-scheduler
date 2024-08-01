@@ -52,7 +52,7 @@ const TaskCards = (props) => {
       {isError && <div>oops error getting individual task data</div>}
       {isSuccess && openTaskModal && (
         <DelTaskModal
-          key={props.task.id + "del"}
+          key={`del-task-modal-${props.task.id}`}
           userData={props.userData}
           taskInfo={taskInfo}
           // task={props.task}
