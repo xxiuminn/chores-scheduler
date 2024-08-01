@@ -60,7 +60,7 @@ Members page - invite, cancel invitation and remove members.
 User profile page
 <img src="readme/userprofile.png">
 
-## Setting up
+## Getting Started
 
 Environment variables for backend
 
@@ -98,3 +98,13 @@ Environment variable for frontend
 ```
 VITE_SERVER
 ```
+
+## Next Steps
+
+- User able to upload profile images.
+- Gamification: Implement reward and penalty points for every chores completed or went overdue.
+- Real-time notifications
+
+## Project Planning
+
+https://trello.com/invite/b/669d24adb7cac6f981dfa487/ATTIc0648991c8eab5bdd923852b497f910912C8024F/sei-project-4
