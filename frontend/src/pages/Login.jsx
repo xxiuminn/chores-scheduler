@@ -49,7 +49,7 @@ const Login = () => {
   // to redirect to different first page.
 
   const { data: getUserData, refetch } = useQuery({
-    queryKey: ["user"],
+    queryKey: ["userlogin"],
     queryFn: async () => {
       console.log("get user data please");
       return await fetchData(
