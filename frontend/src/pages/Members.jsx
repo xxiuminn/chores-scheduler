@@ -15,7 +15,7 @@ const Members = () => {
 
   // fetch user info
   const { data: getUserData, isSuccess: userDataSuccess } = useQuery({
-    queryKey: ["user"],
+    queryKey: ["user", jwtDecode(accessToken).uuid],
     queryFn: async () => {
       console.log("get user data please");
       return await fetchData(
@@ -48,6 +48,7 @@ const Members = () => {
   const { data: getuuid, refetch } = useQuery({
     queryKey: ["emailtouuid"],
     queryFn: async () => {
+      console.log("trying to convert email to uuid");
       return await fetchData(
         "/users/invite/" + emailInvited,
         undefined,
@@ -68,7 +69,7 @@ const Members = () => {
   // Invite to user group
   const { mutate: inviteMember } = useMutation({
     mutationFn: async () => {
-      console.log("run");
+      console.log("attempting to invite member");
       return await fetchData(
         "/users/invite",
         "PATCH",
@@ -84,6 +85,7 @@ const Members = () => {
       console.log("user invited");
       queryClient.invalidateQueries(["members"]);
       setEmailInvited("");
+      queryClient.removeQueries("emailtouuid");
     },
   });
 
@@ -105,13 +107,16 @@ const Members = () => {
       );
     },
     onSuccess: () => {
-      console.log("user invited");
+      console.log("user removing in process");
       queryClient.invalidateQueries(["members"]);
       setEmailInvited("");
-      if (getuuid === jwtDecode(localStorage.getItem("token").uuid))
-        navigate("/joingroup");
     },
   });
+
+  const handleRemoveSelf = (memberuuid) => {
+    removeMember(memberuuid);
+    navigate("/joingroup");
+  };
 
   return (
     <>
@@ -161,14 +166,17 @@ const Members = () => {
                   {membersData.map((member) => {
                     if (member.membership === "ACTIVE")
                       return (
-                        <div className="row mb-3 border-top p-2">
+                        <div
+                          className="row mb-3 border-top p-2"
+                          key={`member-list-${member.uuid}`}
+                        >
                           <div className="col-3">{member.name}</div>
                           <div className="col-5">{member.email}</div>
 
                           {member.email === getUserData.email ? (
                             <button
                               className="col-4"
-                              onClick={() => removeMember(member.uuid)}
+                              onClick={() => handleRemoveSelf(member.uuid)}
                             >
                               Leave
                             </button>
@@ -199,7 +207,10 @@ const Members = () => {
                   {membersData.map((member) => {
                     if (member.membership === "INVITED")
                       return (
-                        <div className="row mb-3 border-top p-2">
+                        <div
+                          className="row mb-3 border-top p-2"
+                          key={`invited-member-${member.uuid}`}
+                        >
                           <div className="col-3">{member.name}</div>
                           <div className="col-5">{member.email}</div>
 

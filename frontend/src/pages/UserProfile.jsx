@@ -13,9 +13,16 @@ const UserProfile = () => {
   const [changedAlert, setChangedAlert] = useState(false);
 
   const { data, isSuccess } = useQuery({
-    queryKey: ["user"],
-    queryFn: async () =>
-      await fetchData("/users/userInfo", undefined, undefined, accessToken),
+    queryKey: ["userprofile"],
+    queryFn: async () => {
+      console.log("run");
+      return await fetchData(
+        "/users/userinfo",
+        undefined,
+        undefined,
+        accessToken
+      );
+    },
   });
 
   const { mutate } = useMutation({
