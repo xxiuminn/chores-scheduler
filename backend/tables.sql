@@ -20,6 +20,7 @@ CREATE TABLE user_groups (
 	name			VARCHAR(50) NOT NULL,
 	created_at		TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 	account_type	VARCHAR(50) NOT NULL,
+	stripe_session_id TEXT,
 	CONSTRAINT fk_type FOREIGN KEY(account_type) REFERENCES accounts(types)
 );
 
