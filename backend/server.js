@@ -46,45 +46,6 @@ app.use("/tasks", tasks);
 app.use("/subscribe", subscribe);
 app.use("/verifypayment", verifypayment);
 
-// app.post("/webhook", async (req, res) => {
-//   //to verify that the event comes from stripe.
-//   let data;
-//   let eventType;
-
-//   const webhookSecret = process.env.STRIPE_ENDPOINT_SECRET;
-//   if (webhookSecret) {
-//     let event;
-//     const sig = req.headers["stripe-signature"];
-
-//     try {
-//       event = stripe.webhooks.constructEvent(req.rawBody, sig, webhookSecret);
-//     } catch (error) {
-//       console.error(error.message);
-//       return res.status(400).json({
-//         status: "error",
-//         message: "webhook signature verification failed",
-//       });
-//     }
-
-//     data = event.data;
-//     // console.log(data);
-//     eventType = event.type;
-//     console.log(eventType);
-//   } else {
-//     data = req.body.data;
-//     eventType = req.body.type;
-//   }
-
-//   if (eventType === "checkout.session.completed") {
-//     console.log("payment received!");
-//     console.log(data.object.status);
-//     // res.json(data.object.status)
-//     // res.json({received: true})
-//   }
-//   // Return a response to acknowledge receipt of the event
-//   res.json(data.object.status);
-// });
-
 const PORT = process.env.port || 8000;
 app.listen(PORT, () => {
   console.log(`Server started on port ${PORT}`);
