@@ -31,8 +31,8 @@ const createTaskGroup = async (req, res) => {
     );
 
     const accountType = accountTypeArr.rows[0].account_type;
-    console.log(accountType);
-    console.log(accountTypeArr);
+    // console.log(accountType);
+    // console.log(accountTypeArr);
 
     // if task group is set to non recurring:
     if (req.body.is_recurring === 0) {
@@ -430,7 +430,7 @@ const updateFollowingTasks = async (req, res) => {
     const taskArr = tasks.rows;
 
     const ogDeadline = task.rows[0].deadline;
-    console.log(ogDeadline);
+    // console.log(ogDeadline);
     const addNum = new Date(deadline) - ogDeadline;
     const addNumInDays = Math.floor(addNum / (1000 * 60 * 60 * 24));
 

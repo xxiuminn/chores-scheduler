@@ -56,6 +56,7 @@ const getUserInfo = async (req, res) => {
       return res.status(400).json({ status: "error", msg: "user not found" });
     }
 
+    // console.log(user.rows[0]);
     res.json(user.rows[0]);
   } catch (error) {
     console.error(error.message);
@@ -90,7 +91,7 @@ const updateUserInfo = async (req, res) => {
       req.decoded.uuid,
     ]);
 
-    console.log(user);
+    // console.log(user);
     if (!user.rows.length) {
       return res.status(400).json({ status: "error", msg: "user not found" });
     }
@@ -126,10 +127,12 @@ const updateUserInfo = async (req, res) => {
 
 const inviteUser = async (req, res) => {
   try {
+    // console.log("try invite user");
     await db.query(
       "UPDATE users SET group_id= $1, membership = $2 WHERE uuid = $3",
       [req.body.group_id, req.body.membership, req.body.uuid]
     );
+    // console.log("user invited");
     res.json({ status: "ok", msg: "user invited" });
   } catch (error) {
     console.error(error.message);
