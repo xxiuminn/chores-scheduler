@@ -15,6 +15,7 @@ A full PERN stack app designed for families, to schedule and manage household ta
 - JavaScript
 - CSS3
 - HTML5
+- AWS EC2 (deployment)
 
 ## Features
 
