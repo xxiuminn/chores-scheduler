@@ -2,8 +2,7 @@
 
 A full PERN stack app designed for families, to schedule and manage household tasks. Think of it as a blend of Google Calendar's scheduling combined with Trello's collaborative tools.
 
-<a href="http://3.0.146.49:5173/login" target="_blank">Live Preview</a>
-Note that the app is deployed via AWS EC2 without any domain.
+Note that the app is deployed via AWS EC2 without any domain: <a href="http://3.0.146.49:5173/login" target="_blank">Live Preview</a>
 
 ## Technology
 
