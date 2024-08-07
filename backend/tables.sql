@@ -2,12 +2,12 @@ CREATE TABLE users (
 	uuid			uuid DEFAULT uuid_generate_v4() PRIMARY KEY,
 	name 			VARCHAR(50) NOT NULL,
 	email			VARCHAR(255) UNIQUE NOT NULL,
-	password		VARCHAR(50) NOT NULL,
+	hash		TEXT NOT NULL,
 	image_url		TEXT,
 	created_at		TIMESTAMP DEFAULT CURRENT_TIMESTAMP,			
 	group_id		SMALLINT,
-	membership VARCHAR(50)
-	CONSTRAINT fk_users FOREIGN KEY(group_id) REFERENCES user_groups(id)
+	membership VARCHAR(50),
+	CONSTRAINT fk_users FOREIGN KEY(group_id) REFERENCES user_groups(id),
 	CONSTRAINT fk_membershiptype FOREIGN KEY(membership) REFERENCES membership(types)
 );
 
@@ -29,7 +29,7 @@ CREATE TABLE task_groups (
 	is_recurring	BOOLEAN NOT NULL,
 	is_rotate BOOLEAN,
 	rule VARCHAR(25),
-	CONSTRAINT fk_recurrence FOREIGN KEY(recurrence_rule) REFERENCES recurrence(rule)
+	CONSTRAINT fk_recurrence FOREIGN KEY(rule) REFERENCES recurrence(rule)
 )
 
 CREATE TABLE recurrence (
@@ -51,7 +51,7 @@ CREATE TABLE tasks (
 	last_modified_by		uuid,
 	group_id			INT NOT NULL,
 
-	CONSTRAINT fk_taskgroupid FOREIGN KEY(group_id) REFERENCES tasks_group(id),
+	CONSTRAINT fk_taskgroupid FOREIGN KEY(group_id) REFERENCES task_groups(id),
 	CONSTRAINT fk_assigneduser FOREIGN KEY(assigned_user) REFERENCES users(uuid),
 	CONSTRAINT fk_createdby FOREIGN KEY(created_by) REFERENCES users(uuid),
 	CONSTRAINT fk_modifiedby FOREIGN KEY(last_modified_by) REFERENCES users(uuid)
@@ -67,3 +67,10 @@ VALUES ('COMPLETED'), ('IN PROGRESS')
 CREATE TABLE membership(
 	types VARCHAR(50) UNIQUE PRIMARY KEY
 )
+
+INSERT INTO membership(types)
+VALUES ('INVITED'), ('ACTIVE')
+;
+
+INSERT INTO accounts(types) 
+VALUES ('FREE'),('PAID');
