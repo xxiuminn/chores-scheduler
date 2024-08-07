@@ -7,6 +7,7 @@ Note that the app is deployed via AWS EC2 without any domain: <a href="http://3.
 To sign in with a sample account:
 <br/>
 email: jasmine@gmail.com
+<br/>
 pw: jasminepw123
 
 ## Technology
