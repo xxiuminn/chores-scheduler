@@ -2,12 +2,35 @@
 
 A full PERN stack app designed for families, to schedule and manage household tasks. Think of it as a blend of Google Calendar's scheduling combined with Trello's collaborative tools.
 
-Note that the app is deployed via AWS EC2 without any domain: <a href="http://3.0.146.49:5173/login" target="_blank">Live Preview</a>
+<a href="https://56c7-3-0-146-49.ngrok-free.app/login" target="_blank">Live Preview</a>
 
 To sign in with a sample account:
 
-email: jasmine@gmail.com
-pw: jasminepw123
+- email: jasmine@gmail.com
+- pw: jasminepw123
+
+To upgrade account, test cards for stripe payments:
+
+<table>
+<tr>
+<th> Brand </th>
+<th> Number </th>
+<th> CVC </th>
+<th> Date </th>
+</tr>
+<tr>
+<td> Visa </td>
+<td> 4242 4242 4242 4242 </td>
+<td> Any 3 digits </td>
+<td> Any future dates </td>
+</tr>
+<tr>
+<td> Mastercard </td>
+<td> 5555 5555 5555 4444 </td>
+<td> Any 3 digits </td>
+<td> Any future dates </td>
+</tr>
+</table>
 
 ## Technology
 
@@ -23,6 +46,7 @@ pw: jasminepw123
 - CSS3
 - HTML5
 - AWS EC2 (deployment)
+- Ngrok (tunneling service)
 
 ## Features
 
